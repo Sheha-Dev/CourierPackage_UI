@@ -1,0 +1,34 @@
+<div class="map-wrapper">
+
+  <div
+    #mapContainer
+    class="map"
+    [style.height]="height"
+  >
+  </div>
+
+
+  @if (
+    !locations ||
+    locations.length === 0
+  ) {
+
+    <div class="map-empty">
+
+      <div class="empty-icon">
+        📍
+      </div>
+
+      <h3>
+        No Locations
+      </h3>
+
+      <p>
+        No map locations are available.
+      </p>
+
+    </div>
+
+  }
+
+</div>

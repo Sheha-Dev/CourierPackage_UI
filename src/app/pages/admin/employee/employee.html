@@ -1,0 +1,47 @@
+<div class="employee-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Employee Management
+      </h1>
+
+      <p>
+        Create, update and manage system employees.
+      </p>
+
+    </div>
+
+    <div class="header-icon">
+      👨‍💼
+    </div>
+
+  </div>
+
+
+  <div >
+
+    <app-employee-add class="component"
+
+      [employee]="selectedEmployee"
+
+      (saved)="onEmployeeSaved()"
+
+      (cancelled)="onEmployeeCancelled()"
+
+    >
+    </app-employee-add>
+
+
+    <app-employee-list 
+
+      (edit)="onEditEmployee($event)"
+
+    >
+    </app-employee-list>
+
+  </div>
+
+</div>

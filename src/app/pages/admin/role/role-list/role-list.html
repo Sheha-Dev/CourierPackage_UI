@@ -1,0 +1,195 @@
+<section class="role-list-card">
+
+  <div class="card-header">
+
+    <div>
+
+      <h2>
+        Role List
+      </h2>
+
+      <p>
+        All available system roles.
+      </p>
+
+    </div>
+
+
+    <div class="role-count">
+
+      {{ roles.length }}
+
+      Roles
+
+    </div>
+
+  </div>
+
+
+  @if (isLoading) {
+
+    <div class="loading-state">
+
+      <div class="large-spinner">
+      </div>
+
+      <p>
+        Loading roles...
+      </p>
+
+    </div>
+
+  } @else if (roles.length === 0) {
+
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        🛡️
+      </div>
+
+      <h3>
+        No Roles Found
+      </h3>
+
+      <p>
+        Create your first role using
+        the form.
+      </p>
+
+    </div>
+
+  } @else {
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              #
+            </th>
+
+            <th>
+              Role Name
+            </th>
+
+            <th class="action-column">
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            role of roles;
+            track role.id;
+            let index = $index
+          ) {
+
+            <tr>
+
+              <td
+                data-label="#"
+                class="index-cell"
+              >
+                {{ index + 1 }}
+              </td>
+
+
+              <td
+                data-label="Role Name"
+              >
+
+                <div class="role-name">
+
+                  <span class="role-icon">
+                    🛡️
+                  </span>
+
+                  <span>
+                    {{ role.name }}
+                  </span>
+
+                </div>
+
+              </td>
+
+
+              <td
+                data-label="Action"
+                class="action-column"
+              >
+
+                <div class="table-actions">
+
+                  <button
+                    type="button"
+                    class="edit-btn"
+                    title="Edit role"
+                    (click)="editRole(role)"
+                  >
+                    ✏️
+
+                    <span>
+                      Edit
+                    </span>
+                  </button>
+
+
+                  <!-- <button
+                    type="button"
+                    class="delete-btn"
+                    title="Delete role"
+                    (click)="deleteRole(role)"
+                  >
+                    🗑️
+
+                    <span>
+                      Delete
+                    </span>
+                  </button> -->
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</section>
+
+
+@if (showDeleteConfirm) {
+
+  <app-confirm-box
+    title="Delete Role"
+    [message]="
+      'Are you sure you want to delete the role ' +
+      (roleToDelete?.name ?? '') +
+      '?'
+    "
+    confirmText="Delete"
+    cancelText="Cancel"
+    confirmType="danger"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  >
+  </app-confirm-box>
+
+}

@@ -1,0 +1,76 @@
+<div class="role-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Role Management
+      </h1>
+
+      <p>
+        Create, update and manage system roles.
+      </p>
+
+    </div>
+
+    <div class="header-icon">
+      🛡️
+    </div>
+
+  </div>
+
+
+  @if (successMessage) {
+
+    <div class="alert alert-success">
+
+      <span>
+        ✓
+      </span>
+
+      {{ successMessage }}
+
+    </div>
+
+  }
+
+
+  @if (errorMessage) {
+
+    <div class="alert alert-error">
+
+      <span>
+        ⚠
+      </span>
+
+      {{ errorMessage }}
+
+    </div>
+
+  }
+
+
+  <div >
+
+    <app-role-add class="role-grid"
+      [selectedRole]="selectedRole"
+      (saved)="onRoleSaved($event)"
+      (saveError)="onRoleSaveError($event)"
+      (cancelEdit)="onCancelEdit()"
+    >
+    </app-role-add>
+
+
+    <app-role-list class="role-grid"
+      [roles]="roles"
+      [isLoading]="isLoading"
+      (edit)="onEditRole($event)"
+      (deleted)="onRoleDeleted($event)"
+      (deleteError)="onRoleDeleteError($event)"
+    >
+    </app-role-list>
+
+  </div>
+
+</div>

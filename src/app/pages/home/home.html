@@ -1,0 +1,261 @@
+<div class="home-page">
+
+  <section class="welcome-section">
+
+    <div class="welcome-content">
+
+      <span class="welcome-badge">
+        {{ displayRole }}
+      </span>
+
+      <h1>
+        @if (isAdmin) {
+          Welcome to Admin Dashboard
+        } @else {
+          Welcome to Courier Package
+        }
+      </h1>
+
+      <p>
+        @if (isAdmin) {
+          Manage packages, employees, roles and warehouses from one place.
+        } @else {
+          Manage your courier packages and recipient information easily.
+        }
+      </p>
+
+    </div>
+
+    <div class="welcome-icon">
+      📦
+    </div>
+
+  </section>
+
+
+  <section class="summary-grid">
+
+    @if (isAdmin) {
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          📦
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Package Management
+          </span>
+
+          <h3>
+            Packages
+          </h3>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          👨‍💼
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Staff Management
+          </span>
+
+          <h3>
+            Employees
+          </h3>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          🏢
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Storage Management
+          </span>
+
+          <h3>
+            Warehouses
+          </h3>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          🛡️
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Access Management
+          </span>
+
+          <h3>
+            Roles
+          </h3>
+        </div>
+
+      </div>
+
+    } @else {
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          📦
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Courier
+          </span>
+
+          <h3>
+            My Packages
+          </h3>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          👤
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Delivery
+          </span>
+
+          <h3>
+            Recipients
+          </h3>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          🚚
+        </div>
+
+        <div>
+          <span class="summary-label">
+            Delivery Service
+          </span>
+
+          <h3>
+            Track Packages
+          </h3>
+        </div>
+
+      </div>
+
+    }
+
+  </section>
+
+
+  <section class="quick-actions-section">
+
+    <div class="section-header">
+
+      <div>
+        <h2>
+          Quick Actions
+        </h2>
+
+        <p>
+          Select an option to continue.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="quick-actions-grid">
+
+      @for (
+        action of visibleQuickActions;
+        track action.route
+      ) {
+
+        <a
+          class="quick-action-card"
+          [routerLink]="action.route"
+        >
+
+          <div class="action-icon">
+            {{ action.icon }}
+          </div>
+
+          <div class="action-content">
+
+            <h3>
+              {{ action.title }}
+            </h3>
+
+            <p>
+              {{ action.description }}
+            </p>
+
+          </div>
+
+          <div class="action-arrow">
+            →
+          </div>
+
+        </a>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <section class="info-section">
+
+    <div class="info-card">
+
+      <div class="info-icon">
+        ℹ️
+      </div>
+
+      <div>
+
+        <h3>
+          Courier Package Management System
+        </h3>
+
+        <p>
+          Use the navigation menu or quick actions above
+          to access the features available for your account.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>

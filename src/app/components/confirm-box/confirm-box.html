@@ -1,0 +1,90 @@
+<div
+  class="confirm-overlay"
+  (click)="onOverlayClick()"
+>
+
+  <div
+    class="confirm-box"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="title"
+    (click)="stopPropagation($event)"
+  >
+
+    <div class="confirm-header">
+
+      <div class="confirm-title-wrapper">
+
+        <div
+          class="confirm-icon"
+          [class.danger]="confirmType === 'danger'"
+          [class.primary]="confirmType === 'primary'"
+        >
+
+          @if (confirmType === 'danger') {
+            ⚠️
+          } @else {
+            ℹ️
+          }
+
+        </div>
+
+
+        <div>
+
+          <h3>
+            {{ title }}
+          </h3>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="close-btn"
+        aria-label="Close"
+        (click)="onCancel()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <div class="confirm-body">
+
+      <p>
+        {{ message }}
+      </p>
+
+    </div>
+
+
+    <div class="confirm-actions">
+
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="onCancel()"
+      >
+        {{ cancelText }}
+      </button>
+
+
+      <button
+        type="button"
+        class="confirm-btn"
+        [class.danger]="confirmType === 'danger'"
+        [class.primary]="confirmType === 'primary'"
+        (click)="onConfirm()"
+      >
+        {{ confirmText }}
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

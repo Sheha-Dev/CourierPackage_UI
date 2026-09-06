@@ -1,0 +1,264 @@
+:host {
+  display: block;
+}
+
+.role-form-card {
+  padding: 22px;
+
+  position: sticky;
+
+  top:
+    calc(
+      var(--topbar-height) +
+      20px
+    );
+
+  background:
+    var(--bg-surface);
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 30px
+    rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 22px;
+}
+
+.card-header h2 {
+  margin: 0 0 4px;
+
+  color:
+    var(--text-primary);
+
+  font-size: 18px;
+}
+
+.card-header p {
+  margin: 0;
+
+  color:
+    var(--text-secondary);
+
+  font-size: 12px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--color-primary) 12%,
+      transparent
+    );
+
+  font-size: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.form-group label {
+  color:
+    var(--text-primary);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.required {
+  color: #dc3545;
+}
+
+.form-control {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 13px;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    var(--radius-md);
+
+  outline: none;
+
+  background:
+    var(--bg-surface-secondary);
+
+  color:
+    var(--text-primary);
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-control::placeholder {
+  color:
+    var(--text-secondary);
+}
+
+.form-control:focus {
+  border-color:
+    var(--color-primary);
+
+  box-shadow:
+    0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--color-primary) 15%,
+      transparent
+    );
+}
+
+.validation-error {
+  color: #dc3545;
+
+  font-size: 11px;
+}
+
+.form-actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.primary-btn,
+.secondary-btn {
+  min-height: 41px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 9px 16px;
+
+  border-radius:
+    var(--radius-md);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.primary-btn {
+  flex: 1;
+
+  border: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-primary),
+      #26c6da
+    );
+
+  color: white;
+}
+
+.secondary-btn {
+  border:
+    1px solid
+    var(--border-color);
+
+  background:
+    var(--bg-surface-secondary);
+
+  color:
+    var(--text-primary);
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+
+  border:
+    2px solid
+    rgba(255, 255, 255, 0.4);
+
+  border-top-color:
+    white;
+
+  border-radius: 50%;
+
+  animation:
+    spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+@media (max-width: 850px) {
+
+  .role-form-card {
+    position: static;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .role-form-card {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .secondary-btn {
+    width: 100%;
+  }
+
+}

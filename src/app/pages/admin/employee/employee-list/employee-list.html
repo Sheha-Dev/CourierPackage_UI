@@ -1,0 +1,281 @@
+<section class="employee-list-card">
+
+  <div class="card-header">
+
+    <div>
+
+      <h2>
+        Employee List
+      </h2>
+
+      <p>
+        Manage registered system users.
+      </p>
+
+    </div>
+
+
+    <div class="employee-count">
+
+      {{ users.length }}
+
+      Users
+
+    </div>
+
+  </div>
+
+
+  @if (successMessage) {
+
+    <div class="alert alert-success">
+
+      ✓
+
+      {{ successMessage }}
+
+    </div>
+
+  }
+
+
+  @if (errorMessage) {
+
+    <div class="alert alert-error">
+
+      ⚠
+
+      {{ errorMessage }}
+
+    </div>
+
+  }
+
+
+  @if (isLoading) {
+
+    <div class="loading-state">
+
+      <div class="spinner">
+      </div>
+
+      <p>
+        Loading users...
+      </p>
+
+    </div>
+
+  } @else if (users.length === 0) {
+
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        👨‍💼
+      </div>
+
+      <h3>
+        No Users Found
+      </h3>
+
+      <p>
+        There are no registered users.
+      </p>
+
+    </div>
+
+  } @else {
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              #
+            </th>
+
+            <th>
+              Username
+            </th>
+
+            <th>
+              Email
+            </th>
+
+            <th>
+              Phone
+            </th>
+
+            <th>
+              Role
+            </th>
+
+            <th class="action-column">
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            user of users;
+            track user.id;
+            let index = $index
+          ) {
+
+            <tr>
+
+              <td
+                data-label="#"
+                class="index-cell"
+              >
+                {{ index + 1 }}
+              </td>
+
+
+              <td
+                data-label="Username"
+              >
+
+                <div class="user-name">
+
+                  <span class="user-icon">
+                    👤
+                  </span>
+
+                  <span>
+                    {{ user.userName }}
+                  </span>
+
+                </div>
+
+              </td>
+
+
+              <td
+                data-label="Email"
+              >
+                {{ user.email || '-' }}
+              </td>
+
+
+              <td
+                data-label="Phone"
+              >
+                {{ user.phoneNumber || '-' }}
+              </td>
+
+
+              <td
+                data-label="Role"
+              >
+
+                @if (
+                  user.roles &&
+                  user.roles.length > 0
+                ) {
+
+                  <div class="role-list">
+
+                    @for (
+                      role of user.roles;
+                      track role
+                    ) {
+
+                      <span class="role-badge">
+                        {{ role }}
+                      </span>
+
+                    }
+
+                  </div>
+
+                } @else {
+
+                  <span class="no-role">
+                    -
+                  </span>
+
+                }
+
+              </td>
+
+
+              <td
+                data-label="Action"
+                class="action-column"
+              >
+
+                <div class="table-actions">
+
+                  <button
+                    type="button"
+                    class="edit-btn"
+                    title="Edit user"
+                    (click)="editUser(user)"
+                  >
+                    ✏️
+
+                    <span>
+                      Edit
+                    </span>
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="deactivate-btn"
+                    title="Deactivate user"
+                    (click)="deactivateUser(user)"
+                  >
+                    ⛔
+
+                    <span>
+                      Deactivate
+                    </span>
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</section>
+
+
+@if (showDeactivateConfirm) {
+
+  <app-confirm-box
+    title="Deactivate User"
+    [message]="
+      'Are you sure you want to deactivate ' +
+      (selectedUser?.userName ?? '') +
+      '?'
+    "
+    confirmText="Deactivate"
+    cancelText="Cancel"
+    confirmType="danger"
+    (confirm)="confirmDeactivate()"
+    (cancel)="cancelDeactivate()"
+  >
+  </app-confirm-box>
+
+}

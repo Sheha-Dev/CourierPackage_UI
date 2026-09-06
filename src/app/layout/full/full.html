@@ -1,0 +1,232 @@
+<div class="app-shell">
+
+  <!-- =========================
+       TOP BAR
+  ========================== -->
+
+  <header class="topbar">
+
+    <div class="topbar-left">
+
+      <!-- Mobile Menu Button -->
+
+      <button
+        type="button"
+        class="menu-toggle"
+        (click)="toggleSidebar()"
+        aria-label="Open navigation menu"
+      >
+        ☰
+      </button>
+
+
+      <!-- Brand -->
+
+      <div class="brand">
+
+        <div class="brand-icon">
+          📦
+        </div>
+
+        <div class="brand-text">
+
+          <h3>
+            Courier Package
+          </h3>
+
+          <span>
+            Management System
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Topbar Right -->
+
+    <div class="topbar-actions">
+
+      @if (userRole) {
+
+        <span class="user-role">
+          {{ userRole }}
+        </span>
+
+      }
+
+
+      <button
+        type="button"
+        class="theme-toggle"
+        (click)="toggleTheme()"
+        [attr.aria-label]="
+          isDarkMode
+            ? 'Enable light mode'
+            : 'Enable dark mode'
+        "
+      >
+
+        <span class="theme-icon">
+
+          @if (isDarkMode) {
+            ☀️
+          } @else {
+            🌙
+          }
+
+        </span>
+
+        <span class="theme-text">
+
+          @if (isDarkMode) {
+            Light
+          } @else {
+            Dark
+          }
+
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="logout-btn"
+        (click)="logout()"
+      >
+
+        <span class="logout-icon">
+          ↪
+        </span>
+
+        <span class="logout-text">
+          Logout
+        </span>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================
+       MAIN BODY
+  ========================== -->
+
+  <div class="app-body">
+
+
+    <!-- Mobile Overlay -->
+
+    @if (isSidebarOpen) {
+
+      <div
+        class="sidebar-overlay"
+        (click)="closeSidebar()"
+      >
+      </div>
+
+    }
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside
+      class="sidebar"
+      [class.open]="isSidebarOpen"
+    >
+
+      <div class="sidebar-header">
+
+        <div class="menu-title">
+          MENU
+        </div>
+
+        <button
+          type="button"
+          class="sidebar-close"
+          (click)="closeSidebar()"
+          aria-label="Close navigation menu"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <nav>
+
+        @for (
+          item of visibleMenuItems;
+          track item.route
+        ) {
+
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{
+              exact: item.route === '/home'
+            }"
+            (click)="closeSidebar()"
+          >
+
+            <span class="menu-icon">
+              {{ item.icon }}
+            </span>
+
+            <span class="menu-label">
+              {{ item.label }}
+            </span>
+
+          </a>
+
+        }
+
+      </nav>
+
+
+      <!-- Mobile User Info -->
+
+      <div class="mobile-user-info">
+
+        <div class="mobile-user-icon">
+          👤
+        </div>
+
+        <div>
+
+          <span class="mobile-user-label">
+            Signed in as
+          </span>
+
+          <strong>
+            {{ userRole }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =========================
+         PAGE CONTENT
+    ========================== -->
+
+    <main class="content">
+
+      <router-outlet>
+      </router-outlet>
+
+    </main>
+
+  </div>
+
+</div>

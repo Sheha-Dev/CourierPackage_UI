@@ -1,0 +1,353 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+
+/* PAGE */
+
+.register-page {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #07152b 0%,
+      #02091c 55%,
+      #010715 100%
+    );
+
+  font-family:
+    Inter,
+    Arial,
+    sans-serif;
+}
+
+
+/* CARD */
+
+.register-card {
+  width: 100%;
+  max-width: 620px;
+
+  padding: 38px 40px;
+
+  background: #0f192e;
+
+  border: 1px solid #24324b;
+  border-radius: 18px;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.3);
+}
+
+
+/* BRAND */
+
+.brand-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.brand-icon {
+  width: 60px;
+  height: 60px;
+
+  margin: 0 auto 14px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 15px;
+
+  font-size: 27px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #57a8ff,
+      #25d0dc
+    );
+}
+
+.brand-section h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 29px;
+  font-weight: 700;
+}
+
+.brand-section p {
+  margin: 4px 0 0;
+
+  color: #8cb5df;
+
+  font-size: 14px;
+}
+
+
+/* HEADER */
+
+.register-header {
+  margin-bottom: 25px;
+}
+
+.register-header h2 {
+  margin: 0 0 6px;
+
+  color: #ffffff;
+
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.register-header p {
+  margin: 0;
+
+  color: #8fb2d8;
+
+  font-size: 15px;
+}
+
+
+/* FORM */
+
+.register-form {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 18px 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+
+/* LABEL */
+
+.form-group label {
+  margin-bottom: 7px;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* INPUT */
+
+.form-control {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  background: #e8f0ff;
+
+  color: #101827;
+
+  border: 1px solid #bac9df;
+  border-radius: 10px;
+
+  outline: none;
+
+  font-size: 15px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-control::placeholder {
+  color: #77859a;
+}
+
+.form-control:focus {
+  border-color: #46b7ee;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(70, 183, 238, 0.18);
+}
+
+
+/* VALIDATION */
+
+.error-message {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #ff6b7a;
+
+  font-size: 12px;
+}
+
+
+/* API ERROR */
+
+.register-error {
+  margin-top: 18px;
+
+  padding: 11px 13px;
+
+  border: 1px solid
+    rgba(255, 93, 112, 0.45);
+
+  border-radius: 8px;
+
+  background:
+    rgba(255, 77, 99, 0.1);
+
+  color: #ff8a98;
+
+  font-size: 13px;
+}
+
+
+/* SUCCESS */
+
+.register-success {
+  margin-top: 18px;
+
+  padding: 11px 13px;
+
+  border: 1px solid
+    rgba(46, 213, 115, 0.45);
+
+  border-radius: 8px;
+
+  background:
+    rgba(46, 213, 115, 0.1);
+
+  color: #5ce593;
+
+  font-size: 13px;
+}
+
+
+/* BUTTON */
+
+.register-btn {
+  width: 100%;
+
+  margin-top: 24px;
+
+  padding: 13px 20px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #58a5f5,
+      #25cedd
+    );
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.register-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 20px
+    rgba(37, 206, 221, 0.18);
+}
+
+.register-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
+/* LOGIN LINK */
+
+.login-text {
+  margin-top: 25px;
+
+  text-align: center;
+
+  color: #8daed3;
+
+  font-size: 14px;
+}
+
+.login-text a {
+  margin-left: 4px;
+
+  color: #55a7ff;
+
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.login-text a:hover {
+  text-decoration: underline;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  .register-page {
+    padding: 20px 14px;
+    align-items: flex-start;
+  }
+
+  .register-card {
+    padding: 28px 22px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: auto;
+  }
+
+  .brand-section h1 {
+    font-size: 24px;
+  }
+
+  .register-header h2 {
+    font-size: 22px;
+  }
+}
