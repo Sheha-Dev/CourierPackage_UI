@@ -1,1 +1,41 @@
-<p>warehouse works!</p>
+<div class="warehouse-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Warehouse Management</h1>
+
+      <p>
+        Create, update and manage warehouse
+        locations.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- =========================
+       WAREHOUSE FORM
+       ========================= -->
+
+  <section class="warehouse-section">
+
+    <app-warehouse-add
+      [warehouse]="selectedWarehouse"
+      (saved)="warehouseSaved()">
+    </app-warehouse-add>
+
+  </section>
+
+
+  <!-- =========================
+       WAREHOUSE LIST
+       ========================= -->
+
+  <section class="warehouse-section">
+
+    <app-warehouse-list
+      (edit)="editWarehouse($event)">
+    </app-warehouse-list>
+
+  </section>
+
+</div>
