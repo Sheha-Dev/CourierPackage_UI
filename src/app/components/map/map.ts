@@ -2,9 +2,11 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
+  Output,
   PLATFORM_ID,
   SimpleChanges,
   ViewChild,
@@ -17,6 +19,7 @@ import {
 
 import type * as Leaflet from 'leaflet';
 
+
 export interface MapLocation {
   latitude: number;
   longitude: number;
@@ -24,6 +27,7 @@ export interface MapLocation {
   label?: string;
   description?: string;
 }
+
 
 @Component({
   selector: 'app-map',
@@ -60,6 +64,12 @@ export class MapComponent
 
   @Input()
   centerLongitude = 79.8612;
+
+
+  // Emits the clicked map position
+  @Output()
+  locationSelected =
+    new EventEmitter<MapLocation>();
 
 
   private platformId =
@@ -100,9 +110,6 @@ export class MapComponent
     this.renderLocations();
 
 
-    // Important:
-    // wait until Angular/layout/sidebar
-    // finishes calculating sizes.
     setTimeout(() => {
 
       this.refreshMapSize();
@@ -110,8 +117,6 @@ export class MapComponent
     }, 100);
 
 
-    // Second refresh helps when the
-    // layout has transitions/sidebar.
     setTimeout(() => {
 
       this.refreshMapSize();
@@ -190,6 +195,37 @@ export class MapComponent
     )
       .addTo(this.map);
 
+
+    /*
+      Emit latitude and longitude
+      when user clicks the map.
+    */
+    this.map.on(
+      'click',
+      (
+        event:
+          Leaflet.LeafletMouseEvent
+      ) => {
+
+        const selectedLocation:
+          MapLocation = {
+
+          latitude:
+            event.latlng.lat,
+
+          longitude:
+            event.latlng.lng
+
+        };
+
+
+        this.locationSelected.emit(
+          selectedLocation
+        );
+
+      }
+    );
+
   }
 
 
@@ -237,6 +273,7 @@ export class MapComponent
       this.refreshMapSize();
 
       return;
+
     }
 
 
@@ -308,7 +345,6 @@ export class MapComponent
     );
 
 
-    // One location
     if (
       validLocations.length === 1
     ) {
@@ -319,8 +355,6 @@ export class MapComponent
       );
 
     }
-
-    // Multiple locations
     else {
 
       const mapBounds =
@@ -422,6 +456,8 @@ export class MapComponent
   ngOnDestroy(): void {
 
     if (this.map) {
+
+      this.map.off();
 
       this.map.remove();
 
