@@ -1,1 +1,226 @@
-<p>warehouse-list works!</p>
+<div class="list-card">
+
+  <div class="list-header">
+
+    <div>
+
+      <h2>
+        Warehouse List
+      </h2>
+
+      <p>
+        View and manage registered
+        warehouses.
+      </p>
+
+    </div>
+
+
+    <div class="search-box">
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (input)="search()"
+        placeholder="Search warehouse..."
+      />
+
+    </div>
+
+  </div>
+
+
+  <div
+    *ngIf="errorMessage"
+    class="error-message">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <div
+    *ngIf="loading"
+    class="loading">
+
+    Loading warehouses...
+
+  </div>
+
+
+  <div
+    class="table-container"
+    *ngIf="!loading">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+
+          <th>
+            Warehouse
+          </th>
+
+          <th>
+            Address
+          </th>
+
+          <th>
+            Street
+          </th>
+
+          <th>
+            Province
+          </th>
+
+          <th>
+            District
+          </th>
+
+          <th>
+            Status
+          </th>
+
+          <th class="actions-column">
+            Actions
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr
+          *ngFor="
+            let warehouse
+            of filteredWarehouses
+          ">
+
+          <td>
+            {{ warehouse.warehouseId }}
+          </td>
+
+
+          <td class="warehouse-name">
+
+            {{
+              warehouse.warehouseName
+            }}
+
+          </td>
+
+
+          <td>
+            {{ warehouse.address }}
+          </td>
+
+
+          <td>
+            {{ warehouse.streetName }}
+          </td>
+
+
+          <td>
+            {{ getProvinceName(
+              warehouse.provinceId
+            ) }}
+          </td>
+
+
+          <td>
+            {{ getDistrictName(
+              warehouse.districtId
+            ) }}
+          </td>
+
+
+          <td>
+
+            <span
+              class="status"
+              [class.active]="
+                warehouse.isActive
+              "
+              [class.inactive]="
+                !warehouse.isActive
+              ">
+
+              {{
+                warehouse.isActive
+                  ? 'Active'
+                  : 'Inactive'
+              }}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <div class="action-buttons">
+
+              <button
+                type="button"
+                class="action-btn edit"
+                (click)="
+                  editWarehouse(
+                    warehouse
+                  )
+                ">
+
+                Edit
+
+              </button>
+
+
+              <button
+                type="button"
+                class="action-btn deactivate"
+                [disabled]="
+                  !warehouse.isActive
+                "
+                (click)="
+                  deactivateWarehouse(
+                    warehouse
+                  )
+                ">
+
+                Deactivate
+
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+
+        <tr
+          *ngIf="
+            filteredWarehouses.length === 0
+          ">
+
+          <td
+            colspan="8"
+            class="empty-row">
+
+            No warehouses found.
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
