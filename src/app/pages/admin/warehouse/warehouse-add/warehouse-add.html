@@ -1,1 +1,356 @@
-<p>warehouse-add works!</p>
+<div class="warehouse-card">
+
+  <div class="card-header">
+
+    <div>
+
+      <h2>
+        {{
+          isEditMode
+            ? 'Update Warehouse'
+            : 'Add Warehouse'
+        }}
+      </h2>
+
+      <p>
+        Enter warehouse information and
+        select its location on the map.
+      </p>
+
+    </div>
+
+
+    <span
+      class="mode-badge"
+      [class.edit-mode]="isEditMode">
+
+      {{
+        isEditMode
+          ? 'Edit Mode'
+          : 'New Warehouse'
+      }}
+
+    </span>
+
+  </div>
+
+
+  <form
+    [formGroup]="warehouseForm"
+    (ngSubmit)="saveWarehouse()">
+
+
+    <!-- WAREHOUSE DETAILS -->
+
+    <div class="form-grid">
+
+
+      <div class="form-group full-width">
+
+        <label>
+          Warehouse Name
+          <span>*</span>
+        </label>
+
+        <input
+          type="text"
+          formControlName="warehouseName"
+          placeholder="Enter warehouse name"
+        />
+
+        <small
+          class="error"
+          *ngIf="
+            hasError(
+              'warehouseName'
+            )
+          ">
+
+          Warehouse name is required.
+
+        </small>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Province
+          <span>*</span>
+        </label>
+
+        <select
+          formControlName="provinceId"
+          (change)="provinceChanged()">
+
+          <option
+            [ngValue]="null">
+
+            Select Province
+
+          </option>
+
+          <option
+            *ngFor="
+              let province of provinces
+            "
+            [ngValue]="
+              province.provinceId
+            ">
+
+            {{
+              province.provinceName
+            }}
+
+          </option>
+
+        </select>
+
+        <small
+          class="error"
+          *ngIf="
+            hasError(
+              'provinceId'
+            )
+          ">
+
+          Province is required.
+
+        </small>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          District
+          <span>*</span>
+        </label>
+
+        <select
+          formControlName="districtId">
+
+          <option
+            [ngValue]="null">
+
+            Select District
+
+          </option>
+
+          <option
+            *ngFor="
+              let district of districts
+            "
+            [ngValue]="
+              district.districtId
+            ">
+
+            {{
+              district.districtName
+            }}
+
+          </option>
+
+        </select>
+
+        <small
+          class="error"
+          *ngIf="
+            hasError(
+              'districtId'
+            )
+          ">
+
+          District is required.
+
+        </small>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Street Name
+          <span>*</span>
+        </label>
+
+        <input
+          type="text"
+          formControlName="streetName"
+          placeholder="Enter street name"
+        />
+
+        <small
+          class="error"
+          *ngIf="
+            hasError(
+              'streetName'
+            )
+          ">
+
+          Street name is required.
+
+        </small>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Address
+          <span>*</span>
+        </label>
+
+        <input
+          type="text"
+          formControlName="address"
+          placeholder="Enter warehouse address"
+        />
+
+        <small
+          class="error"
+          *ngIf="
+            hasError(
+              'address'
+            )
+          ">
+
+          Address is required.
+
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <!-- MAP -->
+
+    <div class="map-section">
+
+      <div class="section-title">
+
+        <div>
+
+          <h3>
+            Warehouse Location
+          </h3>
+
+          <p>
+            Click once on the map to select
+            the warehouse location.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="map-wrapper">
+
+        <app-map
+          [locations]="selectedMapLocation"
+          [height]="'380px'"
+          [zoom]="9"
+          (locationSelected)="mapPointSelected($event)">
+        </app-map>
+
+      </div>
+
+
+      <div class="coordinates">
+
+        <div class="coordinate-box">
+
+          <label>
+            Latitude
+          </label>
+
+          <input
+            type="number"
+            formControlName="latitude"
+            readonly
+          />
+
+        </div>
+
+
+        <div class="coordinate-box">
+
+          <label>
+            Longitude
+          </label>
+
+          <input
+            type="number"
+            formControlName="longitude"
+            readonly
+          />
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+
+    <div
+      class="alert success"
+      *ngIf="message">
+
+      {{ message }}
+
+    </div>
+
+
+    <div
+      class="alert danger"
+      *ngIf="errorMessage">
+
+      {{ errorMessage }}
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="btn secondary"
+        (click)="resetForm()">
+
+        Clear
+
+      </button>
+
+
+      <button
+        type="submit"
+        class="btn primary"
+        [disabled]="isSaving">
+
+        {{
+          isSaving
+            ? 'Saving...'
+            : (
+                isEditMode
+                  ? 'Update Warehouse'
+                  : 'Create Warehouse'
+              )
+        }}
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
