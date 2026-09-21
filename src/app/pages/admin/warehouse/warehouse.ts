@@ -40,13 +40,13 @@ export class Warehouse {
     this.selectedWarehouse = warehouse;
 
     setTimeout(() => {
-      this.warehouseAddComponent
-        ?.loadWarehouse(warehouse);
+      // this.warehouseAddComponent
+      //   ?.loadWarehouse(warehouse);
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      // window.scrollTo({
+      //   top: 0,
+      //   behavior: 'smooth'
+      // });
     });
   }
 
