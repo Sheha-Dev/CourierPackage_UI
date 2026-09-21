@@ -57,4 +57,10 @@ export class LocationService {
       { params }
     );
   }
+
+  getLocationById(locationId: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/GetById?locationId=${locationId}`
+    );
+  }
 }
