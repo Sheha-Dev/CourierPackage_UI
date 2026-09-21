@@ -20,3 +20,22 @@ export interface LocationRequestDto {
   latitude: number;  
   trnUser: string;
 }
+export interface WarehouseListItem {
+
+  warehouseId: number;
+
+  warehouseName: string;
+
+  warehouseLocationId: number;
+
+  warehouseLatitude: number;
+
+  warehouseLongitude: number;
+
+  isActive: boolean;
+
+}
+export interface WarehouseListResponse {
+  data: WarehouseListItem[];
+  message: string;
+}
