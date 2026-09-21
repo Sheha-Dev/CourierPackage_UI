@@ -1,1 +1,392 @@
-<p>package-add works!</p>
+<div class="container package-container">
+
+  <div class="package-card">
+
+    <!-- =========================================
+         HEADER
+         ========================================= -->
+    <div class="card-header">
+
+      <div class="header-content">
+        <h2>Add New Package</h2>
+
+        <p>
+          Create a new package, select the handover warehouse,
+          and choose the delivery destination.
+        </p>
+      </div>
+
+      <span class="mode-badge">
+        New Package
+      </span>
+
+    </div>
+
+
+    <!-- =========================================
+         FORM
+         ========================================= -->
+    <form [formGroup]="packageForm" (ngSubmit)="onSubmit()">
+
+
+      <!-- =========================================
+           PACKAGE INFORMATION
+           ========================================= -->
+      <section class="form-section">
+
+        <div class="section-title">
+
+          <div class="section-icon">
+            📦
+          </div>
+
+          <div>
+            <h3>Package Information</h3>
+
+            <p>
+              Enter the package dimensions, weight, and box type.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+          <!-- Box Type -->
+          <div class="form-group">
+
+            <label for="boxTypeId">
+              Box Type
+            </label>
+
+            <select id="boxTypeId" formControlName="boxTypeId">
+
+              <option value="" disabled>
+                Select box type
+              </option>
+
+              <option *ngFor="let boxType of boxTypes" [value]="boxType.boxTypeId">
+                {{ boxType.boxTypeName }}
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- Weight -->
+          <div class="form-group">
+
+            <label for="estimatedWeight">
+              Weight
+            </label>
+
+            <div class="input-with-unit">
+
+              <input type="number" id="estimatedWeight" formControlName="estimatedWeight"
+                placeholder="Enter package weight" min="0" step="0.01" />
+
+              <span>kg</span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Height -->
+          <div class="form-group">
+
+            <label for="boxHeight">
+              Box Height
+            </label>
+
+            <div class="input-with-unit">
+
+              <input type="number" id="boxHeight" formControlName="boxHeight" placeholder="Enter height" min="0"
+                step="0.01" />
+
+              <span>m</span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Width -->
+          <div class="form-group">
+
+            <label for="boxWidth">
+              Box Width
+            </label>
+
+            <div class="input-with-unit">
+
+              <input type="number" id="boxWidth" formControlName="boxWidth" placeholder="Enter width" min="0"
+                step="0.01" />
+
+              <span>m</span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Length -->
+          <div class="form-group">
+
+            <label for="boxLength">
+              Box Length
+            </label>
+
+            <div class="input-with-unit">
+
+              <input type="number" id="boxLength" formControlName="boxLength" placeholder="Enter length" min="0"
+                step="0.01" />
+
+              <span>m</span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Warehouse -->
+          <div class="form-group">
+
+            <label for="handoverWarehouseId">
+              Handover Warehouse
+            </label>
+
+            <select id="handoverWarehouseId" formControlName="handoverWarehouseId">
+
+              <option value="" disabled>
+                Select warehouse
+              </option>
+
+              <option *ngFor="let warehouse of warehouses" [value]="warehouse.warehouseId">
+                {{ warehouse.warehouseName }}
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================================
+           DELIVERY LOCATION
+           ========================================= -->
+      <section class="map-section">
+
+        <div class="section-title">
+
+          <div class="section-icon">
+            📍
+          </div>
+
+          <div>
+            <h3>Delivery Location</h3>
+
+            <p>
+              Select the destination on the map to calculate
+              the delivery route and distance.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="map-instruction">
+
+          <span class="instruction-icon">
+            ℹ
+          </span>
+
+          <span>
+            Select your handover warehouse first, then click
+            anywhere on the map to select the destination.
+          </span>
+
+        </div>
+
+
+        <div class="map-wrapper">
+
+          <app-map 
+          [sourcePoint]="getsourcePointValue()" 
+          [destinationPoint]="getDestinationPointValue()"
+          [locationList]="destinationPoints"
+          (destinationPointChange)="onDestinationPointChange($event)">
+          </app-map>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================================
+           DELIVERY DETAILS
+           ========================================= -->
+      <section class="details-section">
+
+        <div class="section-title">
+
+          <div class="section-icon">
+            🚚
+          </div>
+
+          <div>
+            <h3>Delivery Details</h3>
+
+            <p>
+              Review the package delivery information.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+          <!-- Received Date -->
+          <div class="form-group">
+
+            <label for="receivedDate">
+              Received Date
+            </label>
+
+            <div class="date-input-wrapper">
+
+              <input type="date" id="receivedDate" formControlName="receivedDate" />
+
+              <span class="input-icon">
+                📅
+              </span>
+
+            </div>
+
+            <small>
+              Date the package was received.
+            </small>
+
+          </div>
+
+
+          <!-- Delivery Date -->
+          <div class="form-group">
+
+            <label for="deliveryDate">
+              Delivery Date
+            </label>
+
+            <div class="date-input-wrapper">
+
+              <input type="date" id="deliveryDate" formControlName="deliveryDate" />
+
+              <span class="input-icon">
+                📅
+              </span>
+
+            </div>
+
+            <small>
+              Expected package delivery date.
+            </small>
+
+          </div>
+
+
+          <!-- Estimated Amount -->
+          <div class="form-group">
+
+            <label for="estimatedAmount">
+              Estimated Amount
+            </label>
+
+            <div class="input-with-unit currency-input">
+
+              <input type="number" id="estimatedAmount" formControlName="estimatedAmount"
+                placeholder="Calculated amount" readonly />
+
+              <span>Rs.</span>
+
+            </div>
+
+            <small>
+              Automatically calculated package amount.
+            </small>
+
+          </div>
+
+
+          <!-- Recipient -->
+          <div class="form-group">
+
+            <label for="recipientId">
+              Recipient
+            </label>
+
+            <select id="recipientId" formControlName="recipientId">
+
+              <option value="" disabled>
+                Select recipient
+              </option>
+
+              <option *ngFor="let recipient of recipients" [value]="recipient.recipientId">
+                {{ recipient.userName }}
+                <span *ngIf="recipient.nickName">
+                  ({{ recipient.nickName }})
+                </span>
+              </option>
+
+            </select>
+
+            <small class="error-text" *ngIf="
+      packageForm.get('recipientId')?.invalid &&
+      packageForm.get('recipientId')?.touched
+    ">
+              Please select a recipient.
+            </small>
+
+          </div>
+
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================================
+           FORM ACTIONS
+           ========================================= -->
+      <div class="form-actions">
+
+        <button type="button" class="btn secondary">
+          Cancel
+        </button>
+
+
+        <button type="submit" class="btn primary" [disabled]="packageForm.invalid">
+
+          <span>
+            Add Package
+          </span>
+
+        </button>
+
+      </div>
+
+
+    </form>
+
+  </div>
+
+</div>

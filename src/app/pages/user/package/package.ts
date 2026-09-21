@@ -1,9 +1,46 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  ViewChild
+} from '@angular/core';
+import { PackageList,PackageListItem } from './package-list/package-list';
+import { PackageAdd } from './package-add/package-add';
 
 @Component({
-  imports: [],
   selector: 'app-package',
-  styleUrl: './package.scss',
+  standalone: true,
+
+  imports: [
+    PackageAdd,
+    PackageList
+  ],
+
   templateUrl: './package.html',
+  styleUrl: './package.scss'
 })
-export class Package {}
+export class PackageComponent {
+
+  @ViewChild(PackageList)
+  packageList?: PackageList;
+
+  @ViewChild(PackageAdd)
+  packageAdd?: PackageAdd;
+
+  onPackageSaved(): void {
+
+    this.packageList
+      ?.
+      loadPackages();
+
+  }
+
+   onViewClick(selectedPackage: PackageListItem): void {
+
+    this.packageAdd?.loadPackage(selectedPackage);
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  }
+}

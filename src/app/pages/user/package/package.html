@@ -1,1 +1,43 @@
-<p>package works!</p>
+<div class="package-page">
+
+  <header class="page-header">
+
+    <div>
+
+      <span class="page-eyebrow">
+        Courier Management
+      </span>
+
+      <h1>
+        Packages
+      </h1>
+
+      <p>
+        Create packages, assign warehouse locations
+        and manage delivery information.
+      </p>
+
+    </div>
+
+  </header>
+
+
+  <section class="package-form-section">
+
+    <app-package-add>
+      
+    </app-package-add>
+
+  </section>
+
+
+  <section class="package-list-section">
+
+    <app-package-list
+      (viewPackage)="onViewClick($event)"
+    >
+    </app-package-list>
+
+  </section>
+
+</div>
