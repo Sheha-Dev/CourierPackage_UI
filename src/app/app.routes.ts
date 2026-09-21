@@ -42,7 +42,7 @@ export const routes: Routes = [
 
         loadComponent: () =>
           import('./pages/user/package/package')
-            .then(m => m.Package)
+            .then(m => m.PackageComponent)
       },
 
       {
