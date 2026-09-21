@@ -1,1 +1,78 @@
-<p>recipient works!</p>
+<div class="recipient-page">
+
+  <!-- ========================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================= -->
+
+  <div class="page-header">
+
+    <div class="header-content">
+
+      <div>
+        <h1>Recipients</h1>
+
+        <p>
+          Manage your saved delivery recipients.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="btn primary"
+        *ngIf="!showForm"
+        (click)="onAddRecipient()">
+
+        <span class="btn-icon">+</span>
+
+        Add Recipient
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- ERROR -->
+  <!-- ========================================= -->
+
+  <div
+    class="alert danger"
+    *ngIf="errorMessage">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- FORM -->
+  <!-- ========================================= -->
+
+  <app-recipient-add
+    *ngIf="showForm"
+
+    [recipient]="selectedRecipient"
+    [isEditMode]="isEditMode"
+
+    (cancel)="onCancelForm()"
+    (saved)="onRecipientSaved()">
+  </app-recipient-add>
+
+
+  <!-- ========================================= -->
+  <!-- LIST -->
+  <!-- ========================================= -->
+
+  <app-recipient-list
+    *ngIf="!showForm"
+
+    [recipients]="recipients"
+    [loading]="loading"
+
+    (addRecipient)="onAddRecipient()"
+    (editRecipient)="onEditRecipient($event)"
+    (deactivateRecipient)="onDeactivateRecipient($event)">
+  </app-recipient-list>
+
+</div>

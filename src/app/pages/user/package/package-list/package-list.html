@@ -1,1 +1,480 @@
-<p>package-list works!</p>
+<div class="package-list-card">
+
+  <div class="list-header">
+
+    <div>
+
+      <h2>
+        Package List
+      </h2>
+
+      <p>
+        View and manage registered packages.
+      </p>
+
+    </div>
+
+
+    <div class="list-actions">
+
+      <div class="search-box">
+
+        <span class="search-icon">
+          🔍
+        </span>
+
+
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          (input)="onSearch()"
+          placeholder="Search package...">
+
+
+        @if (searchText) {
+
+          <button
+            type="button"
+            class="clear-search"
+            (click)="clearSearch()">
+
+            ×
+
+          </button>
+
+        }
+
+      </div>
+
+
+      <button
+        type="button"
+        class="refresh-button"
+        [disabled]="loading"
+        (click)="loadPackages()">
+
+        ↻
+
+        <span>
+          Refresh
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  @if (loading) {
+
+    <div class="state-container">
+
+      <div class="loader">
+      </div>
+
+      <span>
+        Loading packages...
+      </span>
+
+    </div>
+
+  }
+  @else if (errorMessage) {
+
+    <div class="state-container error-state">
+
+      <span class="state-icon">
+        ⚠️
+      </span>
+
+      <strong>
+        {{ errorMessage }}
+      </strong>
+
+      <button
+        type="button"
+        class="retry-button"
+        (click)="loadPackages()">
+
+        Try Again
+
+      </button>
+
+    </div>
+
+  }
+  @else if (
+    filteredPackages.length === 0
+  ) {
+
+    <div class="state-container">
+
+      <span class="state-icon">
+        📦
+      </span>
+
+      <strong>
+        No packages found
+      </strong>
+
+      <span>
+        No package records match your search.
+      </span>
+
+    </div>
+
+  }
+  @else {
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Package
+            </th>
+
+            <th>
+              Tracking ID
+            </th>
+
+            <th>
+              Box Type
+            </th>
+
+            <th>
+              Weight
+            </th>
+
+            <th>
+              Warehouse
+            </th>
+
+            <th>
+              Destination
+            </th>
+
+            <th>
+              Received
+            </th>
+
+            <th>
+              Expected Delivery
+            </th>
+
+            <th>
+              Amount
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Verified
+            </th>
+
+            <th class="action-column">
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            item of filteredPackages;
+            track item.packageId
+          ) {
+
+            <tr>
+
+              <td>
+
+                <div class="package-id">
+
+                  <div class="package-icon">
+                    📦
+                  </div>
+
+
+                  <div>
+
+                    <strong>
+                      #{{ item.packageId }}
+                    </strong>
+
+                    <span>
+                      Package
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <span class="tracking-id">
+
+                  {{
+                    item.packageTrackingId
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.boxTypeId
+                }}
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.estimatedWeight
+                    | number:'1.2-2'
+                }}
+                kg
+
+              </td>
+
+
+              <td>
+
+                <span class="location-value">
+
+                  📍
+
+                  Warehouse
+                  {{
+                    item.handOverWarehouseId
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span class="location-value">
+
+                  🏁
+
+                  Destination
+                  {{
+                    item.destinationId
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.receivedDate
+                    | date:'dd MMM yyyy'
+                }}
+
+                <span class="date-time">
+
+                  {{
+                    item.receivedDate
+                      | date:'hh:mm a'
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.expectedDeliverDate
+                    | date:'dd MMM yyyy'
+                }}
+
+                <span class="date-time">
+
+                  {{
+                    item.expectedDeliverDate
+                      | date:'hh:mm a'
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <strong>
+
+                  {{
+                    item.estimatedAmount
+                      | number:'1.2-2'
+                  }}
+
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="status-badge"
+                  [ngClass]="
+                    getStatusClass(
+                      item.statusId
+                    )
+                  ">
+
+                  {{
+                    getStatusLabel(
+                      item.statusId
+                    )
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                @if (
+                  item.isVerified
+                ) {
+
+                  <span
+                    class="verification-badge verified">
+
+                    ✓ Verified
+
+                  </span>
+
+                }
+                @else {
+
+                  <span
+                    class="verification-badge unverified">
+
+                    Pending
+
+                  </span>
+
+                }
+
+              </td>
+
+
+              <td>
+
+                <div class="row-actions">
+
+                  <button
+                    type="button"
+                    class="icon-button"
+                    title="View package"
+                    (click)="
+                      onView(
+                        item
+                      )
+                    "
+                    >
+
+                    👁
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="icon-button"
+                    title="Edit package"
+                    (click)="
+                      onView(
+                        item
+                      )
+                    ">
+
+                    ✎
+                    
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="icon-button danger"
+                    title="Deactivate package"
+                    (click)="
+                      deactivatePackage(
+                        item.packageId
+                      )
+                    ">
+
+                    ⛔
+
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <div class="table-footer">
+
+      <span>
+
+        Showing
+
+        <strong>
+          {{ filteredPackages.length }}
+        </strong>
+
+        of
+
+        <strong>
+          {{ packages.length }}
+        </strong>
+
+        packages
+
+      </span>
+
+    </div>
+
+  }
+
+</div>

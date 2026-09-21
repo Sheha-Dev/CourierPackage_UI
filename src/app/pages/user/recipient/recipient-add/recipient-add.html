@@ -1,1 +1,210 @@
-<p>recipient-add works!</p>
+<div class="recipient-form-card">
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <div class="form-header">
+
+    <div>
+
+      <div class="title-row">
+
+        <h2>
+          {{ isEditMode ? 'Edit Recipient' : 'Add Recipient' }}
+        </h2>
+
+        <span
+          class="mode-badge"
+          [class.edit]="isEditMode">
+
+          {{ isEditMode ? 'Editing' : 'New' }}
+
+        </span>
+
+      </div>
+
+      <p>
+        {{
+          isEditMode
+            ? 'Update the recipient information below.'
+            : 'Add a recipient for faster package delivery.'
+        }}
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- ERROR -->
+  <!-- ========================================= -->
+
+  <div
+    class="alert danger"
+    *ngIf="errorMessage">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- FORM -->
+  <!-- ========================================= -->
+
+  <form
+    [formGroup]="recipientForm"
+    (ngSubmit)="onSubmit()">
+
+    <div class="form-grid">
+
+      <!-- USER NAME -->
+
+      <div class="form-group">
+
+        <label for="userName">
+          Full Name
+          <span>*</span>
+        </label>
+
+        <input
+          id="userName"
+          type="text"
+          formControlName="userName"
+          placeholder="Enter recipient name"
+          autocomplete="name"
+          [class.invalid]="isInvalid('userName')"
+        />
+
+        <small
+          class="error-text"
+          *ngIf="isInvalid('userName')">
+
+          Name is required.
+
+        </small>
+
+      </div>
+
+
+      <!-- NICKNAME -->
+
+      <div class="form-group">
+
+        <label for="nickName">
+          Nickname
+        </label>
+
+        <input
+          id="nickName"
+          type="text"
+          formControlName="nickName"
+          placeholder="Enter nickname"
+        />
+
+      </div>
+
+
+      <!-- CONTACT -->
+
+      <div class="form-group">
+
+        <label for="contactNumber">
+          Contact Number
+          <span>*</span>
+        </label>
+
+        <input
+          id="contactNumber"
+          type="tel"
+          formControlName="contactNumber"
+          placeholder="Enter contact number"
+          autocomplete="tel"
+          [class.invalid]="isInvalid('contactNumber')"
+        />
+
+        <small
+          class="error-text"
+          *ngIf="isInvalid('contactNumber')">
+
+          Contact number is required.
+
+        </small>
+
+      </div>
+
+
+      <!-- EMAIL -->
+
+      <div class="form-group">
+
+        <label for="email">
+          Email
+          <span>*</span>
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter email address"
+          autocomplete="email"
+          [class.invalid]="isInvalid('email')"
+        />
+
+        <small
+          class="error-text"
+          *ngIf="isInvalid('email')">
+
+          Enter a valid email address.
+
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- ACTIONS -->
+    <!-- ========================================= -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="loading"
+        (click)="onCancel()">
+
+        Cancel
+
+      </button>
+
+      <button
+        type="submit"
+        class="btn primary"
+        [disabled]="loading">
+
+        <span
+          class="button-loader"
+          *ngIf="loading">
+        </span>
+
+        {{
+          loading
+            ? 'Saving...'
+            : (isEditMode
+                ? 'Update Recipient'
+                : 'Save Recipient')
+        }}
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
