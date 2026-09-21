@@ -1,461 +1,660 @@
 import {
   AfterViewInit,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
   Output,
-  PLATFORM_ID,
-  SimpleChanges,
-  ViewChild,
-  inject
+  SimpleChanges
 } from '@angular/core';
 
 import {
-  isPlatformBrowser
+  CommonModule
 } from '@angular/common';
 
-import type * as Leaflet from 'leaflet';
+import * as L from 'leaflet';
 
 
-export interface MapLocation {
+export interface MapPoint {
+  pointName?: string;
   latitude: number;
   longitude: number;
+}
 
-  label?: string;
-  description?: string;
+export interface MapOutputData {
+
+  source: MapPoint;
+  destination: MapPoint;
+  routeDistanceKm: number;
+  routeDurationMinutes: number;
 }
 
 
 @Component({
   selector: 'app-map',
+
   standalone: true,
-  imports: [],
+
+  imports: [
+    CommonModule
+  ],
+
   templateUrl: './map.html',
+
   styleUrl: './map.scss'
 })
 export class MapComponent
-  implements AfterViewInit, OnChanges, OnDestroy {
+  implements
+  AfterViewInit,
+  OnChanges,
+  OnDestroy {
 
-  @ViewChild(
-    'mapContainer',
-    { static: true }
-  )
-  mapContainer!: ElementRef<HTMLDivElement>;
-
-
+  // user selected source point from the drop down in package form
   @Input()
-  locations: MapLocation[] = [];
+  sourcePoint?: MapPoint;
 
-
+  // user selected destination point after creating the package 
   @Input()
-  height = '500px';
+  destinationPoint?: MapPoint ;
 
-
+  // when admin want to create route for the package, he can select multiple points from the warehouse list and the route will be created for the package
   @Input()
-  zoom = 9;
+  locationList: MapPoint[] = [];
 
-
-  @Input()
-  centerLatitude = 6.9271;
-
-
-  @Input()
-  centerLongitude = 79.8612;
-
-
-  // Emits the clicked map position
+  // source and destination points and route distance and duration will be emitted to the parent component when user select the destination point from the map
   @Output()
-  locationSelected =
-    new EventEmitter<MapLocation>();
+  destinationPointChange =
+    new EventEmitter<MapOutputData>();
 
 
-  private platformId =
-    inject(PLATFORM_ID);
+  // import the map object from leaflet library
+  private map?: L.Map;
+
+  // mark point in the map for the source point
+  private sourceMarker?:
+    L.Marker;
+
+  // mark point in the map for the destination point
+  private destinationMarker?:
+    L.Marker;
+
+  // add routes in the map between source and destination points
+  private routeLayer?:
+    L.GeoJSON;
 
 
-  private L?: typeof Leaflet;
+  // =========================================
+  // ROUTE INFORMATION
+  // =========================================
 
-  private map?: Leaflet.Map;
-
-  private markers:
-    Leaflet.Marker[] = [];
-
-  private mapInitialized = false;
+  routeDistanceKm:
+    number | null = null;
 
 
-  async ngAfterViewInit(): Promise<void> {
-
-    if (
-      !isPlatformBrowser(
-        this.platformId
-      )
-    ) {
-      return;
-    }
+  routeDurationMinutes:
+    number | null = null;
 
 
-    this.L =
-      await import('leaflet');
+  loadingRoute = false;
 
+
+  routeError = '';
+
+  ngAfterViewInit(): void {
 
     this.initializeMap();
-
-
-    this.mapInitialized = true;
-
-
-    this.renderLocations();
-
-
-    setTimeout(() => {
-
-      this.refreshMapSize();
-
-    }, 100);
-
-
-    setTimeout(() => {
-
-      this.refreshMapSize();
-
-    }, 400);
-
   }
-
 
   ngOnChanges(
     changes: SimpleChanges
   ): void {
 
-    if (
-      changes['locations'] &&
-      this.mapInitialized
-    ) {
-
-      this.renderLocations();
-
+    if (!this.map) {
+      return;
     }
 
 
     if (
-      changes['height'] &&
-      this.mapInitialized
+      changes['sourcePoint']
     ) {
 
-      setTimeout(() => {
-
-        this.refreshMapSize();
-
-      });
-
+      console.log('Source Point Changed in map.');
+      this.renderSource();
     }
 
+
+    if (
+      changes['destinationPoint']
+    ) {
+
+      this.renderDestination();
+      console.log('Source Point Changed in map.');
+      this.clearRoute();
+
+      if (
+        this.sourcePoint &&
+        this.destinationPoint
+      ) {
+        
+        this.loadRoute();
+
+      }
+      else {
+
+        this.clearRoute();
+      }
+
+    }
   }
 
 
   private initializeMap(): void {
 
-    if (!this.L) {
-      return;
-    }
+    /*
+     * Default center.
+     * Sri Lanka center.
+     */
+    const defaultLatitude =
+      this.sourcePoint?.latitude ??
+      7.8731;
 
 
-    const L = this.L;
+    const defaultLongitude =
+      this.sourcePoint?.longitude ??
+      80.7718;
 
+    // assign value for the map object from leaflet library
 
     this.map =
       L.map(
-        this.mapContainer.nativeElement,
+        'courier-map',
         {
-          zoomControl: true
+          center: [
+            defaultLatitude,
+            defaultLongitude
+          ],
+
+          zoom:
+            this.sourcePoint
+              ? 13
+              : 8
         }
       );
 
-
-    this.map.setView(
-      [
-        this.centerLatitude,
-        this.centerLongitude
-      ],
-      this.zoom
-    );
-
-
+    // Show the actual street map
     L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
-        attribution:
-          '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
 
-        maxZoom: 19
+        attribution:
+          '&copy; OpenStreetMap contributors'
       }
     )
-      .addTo(this.map);
+      .addTo(
+        this.map
+      );
 
 
     /*
-      Emit latitude and longitude
-      when user clicks the map.
-    */
+     * IMPORTANT:
+     *
+     * Clicking ANYWHERE on the map
+     * selects a destination.
+     */
     this.map.on(
       'click',
-      (
-        event:
-          Leaflet.LeafletMouseEvent
-      ) => {
+      event => {
 
-        const selectedLocation:
-          MapLocation = {
-
-          latitude:
-            event.latlng.lat,
-
-          longitude:
-            event.latlng.lng
-
-        };
-
-
-        this.locationSelected.emit(
-          selectedLocation
+        this.handleMapClick(
+          event
         );
-
       }
     );
 
+
+    this.renderSource();
+
+
+    if (
+      this.destinationPoint
+    ) {
+
+      this.renderDestination();
+
+      this.loadRoute();
+    }
+
+
+    /*
+     * Useful when the map is inside
+     * conditional Angular HTML.
+     */
+    setTimeout(
+      () => {
+
+        this.map
+          ?.invalidateSize();
+
+      },
+      100
+    );
   }
 
 
-  private renderLocations(): void {
+  // =========================================
+  // MAP CLICK
+  // =========================================
 
-    if (
-      !this.L ||
-      !this.map
-    ) {
+  private async handleMapClick(
+    event: L.LeafletMouseEvent
+  ): Promise<void> {
+
+    if (!this.sourcePoint) {
+      console.warn('Source location must be selected first.');
       return;
     }
 
+    // Set destination
+    this.destinationPoint = {
+      pointName: 'destination',
+      latitude: event.latlng.lat,
+      longitude: event.latlng.lng
+    };
 
-    const L = this.L;
+    // Show destination marker
+    this.renderDestination();
 
-
-    this.clearMarkers();
-
-
-    const validLocations =
-      this.locations.filter(
-        location =>
-          Number.isFinite(
-            location.latitude
-          ) &&
-          Number.isFinite(
-            location.longitude
-          )
-      );
-
-
-    if (
-      validLocations.length === 0
-    ) {
-
-      this.map.setView(
-        [
-          this.centerLatitude,
-          this.centerLongitude
-        ],
-        this.zoom
-      );
-
-
-      this.refreshMapSize();
-
-      return;
-
-    }
-
-
-    const bounds:
-      Leaflet.LatLngExpression[] = [];
-
-
-    validLocations.forEach(
-      (
-        location,
-        index
-      ) => {
-
-        const latLng:
-          Leaflet.LatLngExpression = [
-
-            location.latitude,
-
-            location.longitude
-
-          ];
-
-
-        bounds.push(
-          latLng
-        );
-
-
-        const marker =
-          L.marker(
-            latLng
-          )
-            .addTo(
-              this.map!
-            );
-
-
-        const title =
-          location.label ??
-          `Location ${index + 1}`;
-
-
-        let popupContent =
-          `<strong>${this.escapeHtml(title)}</strong>`;
-
-
-        if (
-          location.description
-        ) {
-
-          popupContent +=
-            `<br>${this.escapeHtml(
-              location.description
-            )}`;
-
-        }
-
-
-        marker.bindPopup(
-          popupContent
-        );
-
-
-        this.markers.push(
-          marker
-        );
-
-      }
+    // Calculate route and WAIT for the result
+    await this.loadRouteToPoint(
+      this.destinationPoint
     );
 
+    // Create output AFTER route calculation
+    const point: MapOutputData = {
+      source: this.sourcePoint,
+
+      destination: this.destinationPoint,
+
+      routeDistanceKm:
+        this.routeDistanceKm ?? 0,
+
+      routeDurationMinutes:
+        this.routeDurationMinutes ?? 0
+    };
+
+    // Send data to parent
+    this.destinationPointChange.emit(point);
+  }
+
+
+  // =========================================
+  // SOURCE MARKER
+  // =========================================
+
+  private renderSource(): void {
+
 
     if (
-      validLocations.length === 1
+      !this.map ||
+      !this.sourcePoint
     ) {
 
-      this.map.setView(
-        bounds[0],
-        this.zoom
-      );
-
+      return;
     }
-    else {
-
-      const mapBounds =
-        L.latLngBounds(
-          bounds
-        );
 
 
-      this.map.fitBounds(
-        mapBounds,
+    if (
+      this.sourceMarker
+    ) {
+
+      // remove marked point
+      this.map.removeLayer(
+        this.sourceMarker
+      );
+    }
+
+
+    const sourceLatLng:
+      L.LatLngExpression = [
+
+        this.sourcePoint.latitude,
+
+        this.sourcePoint.longitude
+
+      ];
+
+
+    /*
+     * Source marker is fixed.
+     *
+     * draggable = false
+     */
+    this.sourceMarker =
+      L.marker(
+        sourceLatLng,
         {
-          padding: [
-            40,
-            40
-          ],
-
-          maxZoom: 15
+          draggable:
+            false
         }
-      );
-
-    }
-
-
-    setTimeout(() => {
-
-      this.refreshMapSize();
-
-    });
-
-  }
-
-
-  private clearMarkers(): void {
-
-    if (!this.map) {
-      return;
-    }
-
-
-    this.markers.forEach(
-      marker => {
-
-        this.map?.removeLayer(
-          marker
+      )
+        .addTo(
+          this.map
+        )
+        .bindPopup(
+          '<strong>Source Warehouse</strong>'
         );
 
-      }
+
+    this.map.setView(
+      sourceLatLng,
+      13
     );
-
-
-    this.markers = [];
-
   }
 
 
-  refreshMapSize(): void {
+  // =========================================
+  // DESTINATION MARKER FROM INPUT
+  // =========================================
+
+  private renderDestination(): void {
+
+    if (
+      !this.destinationPoint
+    ) {
+
+      this.removeDestinationMarker();
+
+      return;
+    }
+
+
+    this.renderDestinationPoint(
+      this.destinationPoint
+    );
+  }
+
+
+  // =========================================
+  // DESTINATION MARKER
+  // =========================================
+
+  private renderDestinationPoint(
+    point: MapPoint
+  ): void {
 
     if (!this.map) {
       return;
     }
 
+    // remove existing destination marker if any
+    this.removeDestinationMarker();
 
-    this.map.invalidateSize({
-      animate: false
-    });
-
+    // create a new destination marker at the specified point
+    this.destinationMarker =
+      L.marker(
+        [
+          point.latitude,
+          point.longitude
+        ]
+      )
+        .addTo(
+          this.map
+        )
+        .bindPopup(
+          '<strong>Destination</strong>'
+        )
+        .openPopup();
   }
 
 
-  private escapeHtml(
-    value: string
-  ): string {
+  private removeDestinationMarker():
+    void {
 
-    return value
-      .replaceAll(
-        '&',
-        '&amp;'
-      )
-      .replaceAll(
-        '<',
-        '&lt;'
-      )
-      .replaceAll(
-        '>',
-        '&gt;'
-      )
-      .replaceAll(
-        '"',
-        '&quot;'
-      )
-      .replaceAll(
-        "'",
-        '&#039;'
+    if (
+      this.map &&
+      this.destinationMarker
+    ) {
+
+      // remove the existing destination marker from the map
+      this.map.removeLayer(
+        this.destinationMarker
       );
 
+
+      this.destinationMarker =
+        undefined;
+    }
+  }
+
+
+  private loadRoute(): void {
+
+    if (
+      !this.sourcePoint ||
+      !this.destinationPoint
+    ) {
+
+      this.clearRoute();
+
+      return;
+    }
+
+    this.clearRoute();
+
+    this.loadRouteToPoint(
+      this.destinationPoint
+    );
+  }
+
+
+  private async loadRouteToPoint(
+    destination: MapPoint
+  ): Promise<void> {
+
+    if (
+      !this.map ||
+      !this.sourcePoint
+    ) {
+
+      return;
+    }
+
+
+    this.loadingRoute =
+      true;
+
+
+    this.routeError =
+      '';
+
+    // if there is an existing route layer, remove it before drawing a new route
+    this.clearRouteLayer();
+
+
+    const url =
+      'https://router.project-osrm.org/route/v1/driving/' +
+
+      `${this.sourcePoint.longitude},${this.sourcePoint.latitude};` +
+
+      `${destination.longitude},${destination.latitude}` +
+
+      '?overview=full&geometries=geojson';
+
+
+    try {
+
+      const response =
+        await fetch(
+          url
+        );
+
+
+      if (
+        !response.ok
+      ) {
+
+        throw new Error(
+          'Route request failed.'
+        );
+      }
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        !data.routes ||
+        data.routes.length === 0
+      ) {
+
+        throw new Error(
+          'No driving route found.'
+        );
+      }
+
+
+      const route =
+        data.routes[0];
+
+
+      // meters -> kilometers
+      this.routeDistanceKm =
+        route.distance / 1000;
+
+
+      // seconds -> minutes
+      this.routeDurationMinutes =
+        route.duration / 60;
+
+
+      /*
+       * Draw actual road route.
+       */
+      this.routeLayer =
+        L.geoJSON(
+          route.geometry
+        )
+          .addTo(
+            this.map
+          );
+
+
+      /*
+       * Zoom to the full route.
+       */
+      const bounds =
+        this.routeLayer
+          .getBounds();
+
+
+      if (
+        bounds.isValid()
+      ) {
+
+        this.map.fitBounds(
+          bounds,
+          {
+            padding: [
+              30,
+              30
+            ]
+          }
+        );
+      }
+
+
+      this.loadingRoute =
+        false;
+
+
+      console.log(
+        'Route distance:',
+        this.routeDistanceKm,
+        'km'
+      );
+
+
+      console.log(
+        'Route duration:',
+        this.routeDurationMinutes,
+        'minutes'
+      );
+
+    }
+    catch (
+    error
+    ) {
+
+      console.error(
+        'Route calculation failed:',
+        error
+      );
+
+
+      this.routeError =
+        'Unable to calculate route.';
+
+
+      this.routeDistanceKm =
+        null;
+
+
+      this.routeDurationMinutes =
+        null;
+
+
+      this.loadingRoute =
+        false;
+    }
+  }
+
+
+  private clearRoute(): void {
+
+    this.clearRouteLayer();
+
+
+    this.routeDistanceKm =
+      null;
+
+
+    this.routeDurationMinutes =
+      null;
+
+
+    this.routeError =
+      '';
+  }
+
+
+
+  private clearRouteLayer(): void {
+
+    if (
+      this.map &&
+      this.routeLayer
+    ) {
+
+      // remove the existing route layer from the map
+      this.map.removeLayer(
+        this.routeLayer
+      );
+
+
+      this.routeLayer =
+        undefined;
+    }
   }
 
 
   ngOnDestroy(): void {
 
-    if (this.map) {
+    if (
+      this.map
+    ) {
 
       this.map.off();
 
@@ -463,12 +662,7 @@ export class MapComponent
 
       this.map =
         undefined;
-
     }
-
-
-    this.markers = [];
-
   }
 
 }

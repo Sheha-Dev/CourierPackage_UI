@@ -1,31 +1,70 @@
 <div class="map-wrapper">
 
   <div
-    #mapContainer
-    class="map"
-    [style.height]="height">
+    id="courier-map"
+    class="map">
   </div>
 
 
+  @if (loadingRoute) {
+
+    <div class="route-info">
+      Calculating route...
+    </div>
+
+  }
+
+
   @if (
-    !locations ||
-    locations.length === 0
+    !loadingRoute &&
+    routeDistanceKm !== null
   ) {
 
-    <div class="map-empty">
+    <div class="route-info">
 
-      <div class="empty-icon">
-        📍
+      <div>
+        <strong>
+          Route Distance:
+        </strong>
+
+        {{
+          routeDistanceKm
+            | number:'1.1-2'
+        }}
+        km
       </div>
 
-      <h3>
-        Select Location
-      </h3>
 
-      <p>
-        Click anywhere on the map to
-        select the warehouse location.
-      </p>
+      @if (
+        routeDurationMinutes !== null
+      ) {
+
+        <div>
+
+          <strong>
+            Estimated Driving Time:
+          </strong>
+
+          {{
+            routeDurationMinutes
+              | number:'1.0-0'
+          }}
+          minutes
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+
+  @if (routeError) {
+
+    <div class="route-error">
+
+      {{ routeError }}
 
     </div>
 
