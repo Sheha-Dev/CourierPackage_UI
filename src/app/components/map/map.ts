@@ -5,6 +5,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Output,
   SimpleChanges
 } from '@angular/core';
@@ -48,15 +49,24 @@ export class MapComponent
   implements
   AfterViewInit,
   OnChanges,
-  OnDestroy {
+  OnDestroy,
+  OnInit {
 
   // user selected source point from the drop down in package form
   @Input()
-  sourcePoint?: MapPoint;
+  sourcePoint: MapPoint = {
+    pointName:'',
+    latitude:0,
+    longitude:0
+  };
 
   // user selected destination point after creating the package 
   @Input()
-  destinationPoint?: MapPoint ;
+  destinationPoint : MapPoint = {
+    pointName:'',
+    latitude:0,
+    longitude:0
+  };
 
   // when admin want to create route for the package, he can select multiple points from the warehouse list and the route will be created for the package
   @Input()
@@ -101,6 +111,10 @@ export class MapComponent
 
   routeError = '';
 
+  ngOnInit(): void {
+    console.log('Map Component Initialize..');
+  }
+
   ngAfterViewInit(): void {
 
     this.initializeMap();
@@ -121,6 +135,7 @@ export class MapComponent
 
       console.log('Source Point Changed in map.');
       this.renderSource();
+      this.clearRoute();
     }
 
 
@@ -129,7 +144,7 @@ export class MapComponent
     ) {
 
       this.renderDestination();
-      console.log('Source Point Changed in map.');
+      console.log('Destination Point Changed in map.');
       this.clearRoute();
 
       if (
@@ -570,18 +585,18 @@ export class MapComponent
         false;
 
 
-      console.log(
-        'Route distance:',
-        this.routeDistanceKm,
-        'km'
-      );
+      // console.log(
+      //   'Route distance:',
+      //   this.routeDistanceKm,
+      //   'km'
+      // );
 
 
-      console.log(
-        'Route duration:',
-        this.routeDurationMinutes,
-        'minutes'
-      );
+      // console.log(
+      //   'Route duration:',
+      //   this.routeDurationMinutes,
+      //   'minutes'
+      // );
 
     }
     catch (
