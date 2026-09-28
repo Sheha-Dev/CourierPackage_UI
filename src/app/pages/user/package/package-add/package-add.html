@@ -218,8 +218,8 @@
         <div class="map-wrapper">
 
           <app-map 
-          [sourcePoint]="getsourcePointValue()" 
-          [destinationPoint]="getDestinationPointValue()"
+          [sourcePoint]="sourcePointValue" 
+          [destinationPoint]="selectedDestination"
           [locationList]="destinationPoints"
           (destinationPointChange)="onDestinationPointChange($event)">
           </app-map>
