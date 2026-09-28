@@ -67,6 +67,10 @@ export class PackageAdd implements OnInit {
   recipients: RecipientResponse[] = [];
 
   location! : Location ;
+
+  sourcePointValue! : MapPoint ;
+
+  selectedDestination! : MapPoint ;
   // ==================================================
   // FORM
   // ==================================================
@@ -88,7 +92,7 @@ export class PackageAdd implements OnInit {
   // SELECTED DESTINATION
   // ==================================================
 
-  selectedDestination: MapPoint | null = null;
+  
 
 
   // ==================================================
@@ -241,7 +245,7 @@ export class PackageAdd implements OnInit {
         this.recipients =
           response.allRecipients.data;
 
-
+        this.getsourcePointValue();
         this.setMapDestinationPoints();
 
 
@@ -265,14 +269,16 @@ export class PackageAdd implements OnInit {
 
   async loadPackage(packageData:PackageListItem){
 
-    console.log('Selected Package:',packageData);
+    console.log('Package Form ==> Selected Package:',packageData);
 
     await this.locationService.getLocationById(packageData.destinationId).subscribe
     (
       (response) => {
-          this.location = response.data;
-          this.getDestinationPointValue();
-          console.log('Des Loc:',this.location);
+          this.location =  response.data;
+          this.getsourcePointValue();
+          var value = this.getDestinationPointValue();
+          console.log('Package Form ==> Des Returned Value:',value);
+          console.log('Package Form ==> Des Loc:',this.location);
       },
       (error) => {
         console.log('Error:',error.error.message);
@@ -422,7 +428,7 @@ export class PackageAdd implements OnInit {
   // GET SOURCE / WAREHOUSE LOCATION
   // ==================================================
 
-  getsourcePointValue(): MapPoint {
+  getsourcePointValue(): void {
 
     const warehouseId =
       this.packageForm
@@ -443,7 +449,7 @@ export class PackageAdd implements OnInit {
     );
 
 
-    const pointValue: MapPoint = {
+     this.sourcePointValue = {
 
       pointName:
         warehouse?.warehouseName,
@@ -456,19 +462,13 @@ export class PackageAdd implements OnInit {
 
     };
 
-
-    console.log(
-      'Source Point:',
-      pointValue
-    );
-
-
-    return pointValue;
+    console.log('Source Point Value in getsourcePointValue Method:',this.sourcePointValue);
+    
   }
 
-  getDestinationPointValue(): MapPoint{
+  getDestinationPointValue(): void{
 
-    const pointValue: MapPoint = {
+    this.selectedDestination = {
 
       pointName:
         '',
@@ -481,7 +481,7 @@ export class PackageAdd implements OnInit {
 
     };
 
-    return pointValue;
+    console.log('Destination Point Value in getDestinationPointValue Method:',this.selectedDestination);
   }
 
 
@@ -630,9 +630,7 @@ export class PackageAdd implements OnInit {
           this.packageForm.reset();
 
 
-          // Clear selected destination
-          this.selectedDestination =
-            null;
+          
         },
 
 
