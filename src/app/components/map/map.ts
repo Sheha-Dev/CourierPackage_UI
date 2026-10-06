@@ -10,9 +10,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 
-import {
-  CommonModule
-} from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 import * as L from 'leaflet';
 
@@ -24,7 +22,6 @@ export interface MapPoint {
 }
 
 export interface MapOutputData {
-
   source: MapPoint;
   destination: MapPoint;
   routeDistanceKm: number;
@@ -46,82 +43,68 @@ export interface MapOutputData {
   styleUrl: './map.scss'
 })
 export class MapComponent
-  implements
-  AfterViewInit,
-  OnChanges,
-  OnDestroy,
-  OnInit {
+  implements AfterViewInit, OnChanges, OnDestroy, OnInit {
 
-  // user selected source point from the drop down in package form
   @Input()
   sourcePoint: MapPoint = {
-    pointName:'',
-    latitude:0,
-    longitude:0
+    pointName: '',
+    latitude: 0,
+    longitude: 0
   };
 
-  // user selected destination point after creating the package 
   @Input()
-  destinationPoint : MapPoint = {
-    pointName:'',
-    latitude:0,
-    longitude:0
+  destinationPoint: MapPoint = {
+    pointName: '',
+    latitude: 0,
+    longitude: 0
   };
 
-  // when admin want to create route for the package, he can select multiple points from the warehouse list and the route will be created for the package
   @Input()
   locationList: MapPoint[] = [];
 
   @Input()
-    routeRequired : boolean = false;
+  routeRequired: boolean = false;
 
-  // source and destination points and route distance and duration will be emitted to the parent component when user select the destination point from the map
   @Output()
   destinationPointChange =
     new EventEmitter<MapOutputData>();
 
 
-  // import the map object from leaflet library
   private map?: L.Map;
 
-  // mark point in the map for the source point
-  private sourceMarker?:
-    L.Marker;
+  private sourceMarker?: L.Marker;
 
-  // mark point in the map for the destination point
-  private destinationMarker?:
-    L.Marker;
+  private destinationMarker?: L.Marker;
 
-  // add routes in the map between source and destination points
-  private routeLayer?:
-    L.GeoJSON;
+  private routeLayer?: L.GeoJSON;
 
 
   // =========================================
   // ROUTE INFORMATION
   // =========================================
 
-  routeDistanceKm:
-    number | null = null;
+  routeDistanceKm: number | null = null;
 
-
-  routeDurationMinutes:
-    number | null = null;
-
+  routeDurationMinutes: number | null = null;
 
   loadingRoute = false;
 
-
   routeError = '';
+
+
+  // =========================================
+  // LIFECYCLE
+  // =========================================
 
   ngOnInit(): void {
     console.log('Map Component Initialize..');
   }
 
-  ngAfterViewInit(): void {
 
+  ngAfterViewInit(): void {
     this.initializeMap();
   }
+
 
   ngOnChanges(
     changes: SimpleChanges
@@ -133,10 +116,13 @@ export class MapComponent
 
 
     if (
-      changes['sourcePoint'] && this.routeRequired
+      changes['sourcePoint'] &&
+      this.routeRequired
     ) {
+      console.log(
+        'Source Point Changed in map.'
+      );
 
-      console.log('Source Point Changed in map.');
       this.renderSource();
       this.clearRoute();
     }
@@ -147,43 +133,70 @@ export class MapComponent
     ) {
 
       this.renderDestination();
-      console.log('Destination Point Changed in map.');
+
+      console.log(
+        'Destination Point Changed in map.'
+      );
+
       this.clearRoute();
+
 
       if (
         this.sourcePoint &&
-        this.destinationPoint && this.routeRequired
+        this.destinationPoint &&
+        this.routeRequired
       ) {
-        
         this.loadRoute();
-
       }
       else {
-
         this.clearRoute();
       }
-
     }
   }
 
 
+  // =========================================
+  // INITIALIZE MAP
+  // =========================================
+
   private initializeMap(): void {
 
     /*
-     * Default center.
-     * Sri Lanka center.
+     * Important for OpenStreetMap tiles.
+     *
+     * This allows the browser to send the
+     * application origin as the Referer.
+     */
+    L.TileLayer.prototype.options.referrerPolicy =
+      'strict-origin-when-cross-origin';
+
+
+    /*
+     * Default center: Sri Lanka.
      */
     const defaultLatitude =
-      this.sourcePoint?.latitude ??
-      7.8731;
+      this.sourcePoint &&
+      this.sourcePoint.latitude !== 0
+        ? this.sourcePoint.latitude
+        : 7.8731;
 
 
     const defaultLongitude =
-      this.sourcePoint?.longitude ??
-      80.7718;
+      this.sourcePoint &&
+      this.sourcePoint.longitude !== 0
+        ? this.sourcePoint.longitude
+        : 80.7718;
 
-    // assign value for the map object from leaflet library
 
+    const hasValidSource =
+      !!this.sourcePoint &&
+      this.sourcePoint.latitude !== 0 &&
+      this.sourcePoint.longitude !== 0;
+
+
+    /*
+     * Create Leaflet map.
+     */
     this.map =
       L.map(
         'courier-map',
@@ -193,21 +206,28 @@ export class MapComponent
             defaultLongitude
           ],
 
-          zoom:
-            this.sourcePoint
-              ? 13
-              : 8
+          zoom: hasValidSource
+            ? 13
+            : 8
         }
       );
 
-    // Show the actual street map
+
+    // =========================================
+    // OPENSTREETMAP TILE LAYER
+    // =========================================
+
     L.tileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
         maxZoom: 19,
 
         attribution:
-          '&copy; OpenStreetMap contributors'
+          '&copy; https://www.openstreetmap.org/copyright' +
+          'OpenStreetMap contributors</a>',
+
+        referrerPolicy:
+          'strict-origin-when-cross-origin'
       }
     )
       .addTo(
@@ -215,16 +235,13 @@ export class MapComponent
       );
 
 
-    /*
-     * IMPORTANT:
-     *
-     * Clicking ANYWHERE on the map
-     * selects a destination.
-     */
+    // =========================================
+    // MAP CLICK
+    // =========================================
+
     this.map.on(
       'click',
       event => {
-
         this.handleMapClick(
           event
         );
@@ -232,31 +249,64 @@ export class MapComponent
     );
 
 
-    this.renderSource();
+    // =========================================
+    // INITIAL MARKERS
+    // =========================================
+
+    if (hasValidSource) {
+      this.renderSource();
+    }
 
 
     if (
-      this.destinationPoint
+      this.isValidPoint(
+        this.destinationPoint
+      )
     ) {
 
       this.renderDestination();
 
-      this.loadRoute();
+
+      if (
+        this.routeRequired &&
+        hasValidSource
+      ) {
+        this.loadRoute();
+      }
     }
 
 
     /*
-     * Useful when the map is inside
+     * Useful when map is inside
      * conditional Angular HTML.
      */
     setTimeout(
       () => {
-
         this.map
           ?.invalidateSize();
-
       },
       100
+    );
+  }
+
+
+  // =========================================
+  // VALIDATE POINT
+  // =========================================
+
+  private isValidPoint(
+    point?: MapPoint
+  ): boolean {
+
+    if (!point) {
+      return false;
+    }
+
+    return (
+      Number.isFinite(point.latitude) &&
+      Number.isFinite(point.longitude) &&
+      point.latitude !== 0 &&
+      point.longitude !== 0
     );
   }
 
@@ -269,35 +319,57 @@ export class MapComponent
     event: L.LeafletMouseEvent
   ): Promise<void> {
 
-    if (!this.sourcePoint && this.routeRequired) {
-      console.warn('Source location must be selected first.');
+    if (
+      this.routeRequired &&
+      !this.isValidPoint(this.sourcePoint)
+    ) {
+      console.warn(
+        'Source location must be selected first.'
+      );
+
       return;
     }
 
-    // Set destination
+
+    /*
+     * Set destination.
+     */
     this.destinationPoint = {
       pointName: 'destination',
       latitude: event.latlng.lat,
       longitude: event.latlng.lng
     };
 
-    // Show destination marker
+
+    /*
+     * Show destination marker.
+     */
     this.renderDestination();
 
-    // Calculate route and WAIT for the result
 
-    if(this.routeRequired){
+    /*
+     * Calculate route.
+     */
+    if (
+      this.routeRequired
+    ) {
+
       await this.loadRouteToPoint(
-      this.destinationPoint
-    );
+        this.destinationPoint
+      );
     }
-    
 
-    // Create output AFTER route calculation
+
+    /*
+     * Emit result to parent.
+     */
     const point: MapOutputData = {
-      source: this.sourcePoint,
 
-      destination: this.destinationPoint,
+      source:
+        this.sourcePoint,
+
+      destination:
+        this.destinationPoint,
 
       routeDistanceKm:
         this.routeDistanceKm ?? 0,
@@ -306,8 +378,10 @@ export class MapComponent
         this.routeDurationMinutes ?? 0
     };
 
-    // Send data to parent
-    this.destinationPointChange.emit(point);
+
+    this.destinationPointChange.emit(
+      point
+    );
   }
 
 
@@ -317,24 +391,27 @@ export class MapComponent
 
   private renderSource(): void {
 
-
     if (
       !this.map ||
-      !this.sourcePoint
+      !this.isValidPoint(this.sourcePoint)
     ) {
-
       return;
     }
 
 
+    /*
+     * Remove previous source marker.
+     */
     if (
       this.sourceMarker
     ) {
 
-      // remove marked point
       this.map.removeLayer(
         this.sourceMarker
       );
+
+      this.sourceMarker =
+        undefined;
     }
 
 
@@ -349,16 +426,13 @@ export class MapComponent
 
 
     /*
-     * Source marker is fixed.
-     *
-     * draggable = false
+     * Create new source marker.
      */
     this.sourceMarker =
       L.marker(
         sourceLatLng,
         {
-          draggable:
-            false
+          draggable: false
         }
       )
         .addTo(
@@ -369,6 +443,9 @@ export class MapComponent
         );
 
 
+    /*
+     * Move map to source.
+     */
     this.map.setView(
       sourceLatLng,
       13
@@ -383,7 +460,9 @@ export class MapComponent
   private renderDestination(): void {
 
     if (
-      !this.destinationPoint
+      !this.isValidPoint(
+        this.destinationPoint
+      )
     ) {
 
       this.removeDestinationMarker();
@@ -410,10 +489,16 @@ export class MapComponent
       return;
     }
 
-    // remove existing destination marker if any
+
+    /*
+     * Remove existing destination marker.
+     */
     this.removeDestinationMarker();
 
-    // create a new destination marker at the specified point
+
+    /*
+     * Create destination marker.
+     */
     this.destinationMarker =
       L.marker(
         [
@@ -431,6 +516,10 @@ export class MapComponent
   }
 
 
+  // =========================================
+  // REMOVE DESTINATION MARKER
+  // =========================================
+
   private removeDestinationMarker():
     void {
 
@@ -439,7 +528,6 @@ export class MapComponent
       this.destinationMarker
     ) {
 
-      // remove the existing destination marker from the map
       this.map.removeLayer(
         this.destinationMarker
       );
@@ -451,11 +539,15 @@ export class MapComponent
   }
 
 
+  // =========================================
+  // LOAD ROUTE
+  // =========================================
+
   private loadRoute(): void {
 
     if (
-      !this.sourcePoint ||
-      !this.destinationPoint
+      !this.isValidPoint(this.sourcePoint) ||
+      !this.isValidPoint(this.destinationPoint)
     ) {
 
       this.clearRoute();
@@ -463,13 +555,19 @@ export class MapComponent
       return;
     }
 
+
     this.clearRoute();
 
-    this.loadRouteToPoint(
+
+    void this.loadRouteToPoint(
       this.destinationPoint
     );
   }
 
+
+  // =========================================
+  // LOAD ROUTE TO DESTINATION
+  // =========================================
 
   private async loadRouteToPoint(
     destination: MapPoint
@@ -477,9 +575,8 @@ export class MapComponent
 
     if (
       !this.map ||
-      !this.sourcePoint
+      !this.isValidPoint(this.sourcePoint)
     ) {
-
       return;
     }
 
@@ -491,10 +588,18 @@ export class MapComponent
     this.routeError =
       '';
 
-    // if there is an existing route layer, remove it before drawing a new route
+
+    /*
+     * Remove previous route.
+     */
     this.clearRouteLayer();
 
 
+    /*
+     * OSRM expects coordinates as:
+     *
+     * longitude,latitude
+     */
     const url =
       'https://router.project-osrm.org/route/v1/driving/' +
 
@@ -518,7 +623,7 @@ export class MapComponent
       ) {
 
         throw new Error(
-          'Route request failed.'
+          `Route request failed: ${response.status}`
         );
       }
 
@@ -542,22 +647,33 @@ export class MapComponent
         data.routes[0];
 
 
-      // meters -> kilometers
+      /*
+       * meters -> kilometers
+       */
       this.routeDistanceKm =
         route.distance / 1000;
 
 
-      // seconds -> minutes
+      /*
+       * seconds -> minutes
+       */
       this.routeDurationMinutes =
         route.duration / 60;
 
 
       /*
-       * Draw actual road route.
+       * Draw road route.
        */
       this.routeLayer =
         L.geoJSON(
-          route.geometry
+          route.geometry,
+          {
+            style: {
+              color: '#1976d2',
+              weight: 5,
+              opacity: 0.8
+            }
+          }
         )
           .addTo(
             this.map
@@ -565,7 +681,7 @@ export class MapComponent
 
 
       /*
-       * Zoom to the full route.
+       * Zoom map to full route.
        */
       const bounds =
         this.routeLayer
@@ -590,24 +706,9 @@ export class MapComponent
 
       this.loadingRoute =
         false;
-
-
-      // console.log(
-      //   'Route distance:',
-      //   this.routeDistanceKm,
-      //   'km'
-      // );
-
-
-      // console.log(
-      //   'Route duration:',
-      //   this.routeDurationMinutes,
-      //   'minutes'
-      // );
-
     }
     catch (
-    error
+      error
     ) {
 
       console.error(
@@ -634,6 +735,10 @@ export class MapComponent
   }
 
 
+  // =========================================
+  // CLEAR ROUTE
+  // =========================================
+
   private clearRoute(): void {
 
     this.clearRouteLayer();
@@ -652,6 +757,9 @@ export class MapComponent
   }
 
 
+  // =========================================
+  // CLEAR ROUTE LAYER
+  // =========================================
 
   private clearRouteLayer(): void {
 
@@ -660,7 +768,6 @@ export class MapComponent
       this.routeLayer
     ) {
 
-      // remove the existing route layer from the map
       this.map.removeLayer(
         this.routeLayer
       );
@@ -671,6 +778,10 @@ export class MapComponent
     }
   }
 
+
+  // =========================================
+  // DESTROY MAP
+  // =========================================
 
   ngOnDestroy(): void {
 
@@ -686,5 +797,4 @@ export class MapComponent
         undefined;
     }
   }
-
 }
