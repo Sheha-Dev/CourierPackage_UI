@@ -14,8 +14,9 @@ import {
 import {
   FormsModule
 } from '@angular/forms';
-import { PackageService } from '../../../../services/package.service';
+import { PackageItem, PackageResponse, PackageService } from '../../../../services/package.service';
 import { PackageAdd } from '../package-add/package-add';
+import { TokenService } from '../../../../services/token.service';
 
 
 
@@ -57,8 +58,8 @@ export class PackageList
 
   @Output()  viewPackage = new EventEmitter<PackageListItem>();
 
-  packages: PackageListItem[] = [];
-  filteredPackages: PackageListItem[] = [];
+  packages: PackageItem[] = [];
+  filteredPackages: PackageItem[] = [];
 
   loading = false;
 
@@ -70,7 +71,8 @@ export class PackageList
 
   constructor(
     private packageService: PackageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private tokenService : TokenService
   ) { }
 
 
@@ -86,14 +88,17 @@ export class PackageList
     this.loading = true;
 
     this.errorMessage = '';
-
+    var userId = this.tokenService.getUserId() ?? '';
 
     this.packageService
-      .getAllPackages()
+      .getByUserId(userId)
       .subscribe({
 
         next: response => {
 
+          console.log('Response:', response);
+console.log('Data:', response.data);
+console.log('Is Array:', Array.isArray(response.data));
           this.packages =
             response.data ?? [];
 
@@ -105,8 +110,8 @@ export class PackageList
 
 
           this.loading = false;
+          
           this.cdr.detectChanges();
-
         },
 
 
@@ -117,17 +122,21 @@ export class PackageList
             error
           );
 
+          this.loading = false;
+          
+          this.cdr.detectChanges();
 
           this.errorMessage =
             'Unable to load packages.';
 
 
-          this.loading = false;
+          
 
         }
 
       });
 
+      
   }
 
 

@@ -60,7 +60,7 @@
               Box Type
             </label>
 
-            <select id="boxTypeId" formControlName="boxTypeId">
+            <select id="boxTypeId" formControlName="boxTypeId" (change)="enableBoxSize()" >
 
               <option value="" disabled>
                 Select box type
@@ -85,7 +85,7 @@
             <div class="input-with-unit">
 
               <input type="number" id="estimatedWeight" formControlName="estimatedWeight"
-                placeholder="Enter package weight" min="0" step="0.01" />
+                placeholder="Enter package weight" min="0" step="0.01" [disabled]="boxTypeSelected"/>
 
               <span>kg</span>
 
@@ -221,6 +221,7 @@
           [sourcePoint]="sourcePointValue" 
           [destinationPoint]="selectedDestination"
           [locationList]="destinationPoints"
+          [routeRequired]="true"
           (destinationPointChange)="onDestinationPointChange($event)">
           </app-map>
 
@@ -288,7 +289,7 @@
 
             <div class="date-input-wrapper">
 
-              <input type="date" id="deliveryDate" formControlName="deliveryDate" />
+              <input type="date" id="deliveryDate" formControlName="deliveryDate" (change)="IsValidDeliveryDate()"/>
 
               <span class="input-icon">
                 📅
@@ -390,3 +391,4 @@
   </div>
 
 </div>
+

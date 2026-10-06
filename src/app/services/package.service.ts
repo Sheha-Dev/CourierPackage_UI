@@ -69,7 +69,8 @@ export interface PackageItem {
   updatedDate: string;
   updatedBy: string;
   isActive: boolean;
-  
+  verifiedBy: string;
+  verifiedDate: Date;
 }
 
 
@@ -80,7 +81,7 @@ export interface PackageListResponse {
 
 
 export interface PackageResponse {
-  data: PackageItem;
+  data: PackageItem[];
   message: string;
 }
 
@@ -197,6 +198,22 @@ export class PackageService {
     return this.http.patch<ApiMessageResponse>(
       `${this.apiUrl}/Deactivate`,
       null,
+      { params }
+    );
+  }
+
+  getByUserId(
+    userId: string
+  ): Observable<PackageResponse> {
+
+    const params = new HttpParams()
+      .set(
+        'userId',
+        userId
+      );
+
+    return this.http.get<PackageResponse>(
+      `${this.apiUrl}/GetByUserId?`,
       { params }
     );
   }

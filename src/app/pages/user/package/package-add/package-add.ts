@@ -39,6 +39,7 @@ import { TokenService } from '../../../../services/token.service';
 import { RecipientService } from '../../../../services/recipient.service';
 import { RecipientResponse } from '../../../../models/recipient';
 import { PackageListItem } from '../package-list/package-list';
+import { disabled } from '@angular/forms/signals';
 
 
 @Component({
@@ -84,6 +85,8 @@ export class PackageAdd implements OnInit {
   // ==================================================
 
   updateMode = false;
+
+  boxTypeSelected = true;
 
   packageId = 0;
 
@@ -140,15 +143,16 @@ export class PackageAdd implements OnInit {
       ],
 
       boxHeight: [
-        '',
+         { value: '', disabled: true },
         [
           Validators.required,
           Validators.min(0.1)
+          
         ]
       ],
 
       boxWidth: [
-        '',
+         { value: '', disabled: true },
         [
           Validators.required,
           Validators.min(0.1)
@@ -156,7 +160,7 @@ export class PackageAdd implements OnInit {
       ],
 
       boxLength: [
-        '',
+         { value: '', disabled: true },
         [
           Validators.required,
           Validators.min(0.1)
@@ -265,6 +269,28 @@ export class PackageAdd implements OnInit {
       }
 
     });
+  }
+
+  IsValidDeliveryDate(){
+    // if(this.packageForm.get('receivedDate')?.value < this.packageForm.get('deliveryDate')?.value){
+    //     this.packageForm.get('deliveryDate')?.setValue('');
+    //       }
+    
+  }
+
+  enableBoxSize(){
+    if (this.packageForm.get('boxTypeId')?.value != '' && this.packageForm.get('boxTypeId')?.value != this.boxTypes.find( x => x.boxTypeName == 'Standard')?.boxTypeId) {
+      this.packageForm.enable();
+      this.packageForm.get('boxHeight')?.setValue('');
+      this.packageForm.get('boxLength')?.setValue('');
+      this.packageForm.get('boxWidth')?.setValue('');
+
+    } else {
+      
+      this.packageForm.get('boxHeight')?.setValue(3);
+      this.packageForm.get('boxLength')?.setValue(3);
+      this.packageForm.get('boxWidth')?.setValue(3);
+    }
   }
 
   async loadPackage(packageData:PackageListItem){
@@ -818,7 +844,7 @@ export class PackageAdd implements OnInit {
   private buildPackageRequest(): PackageRequest {
 
     const form =
-      this.packageForm.value;
+      this.packageForm.getRawValue();
 
 
     /*
