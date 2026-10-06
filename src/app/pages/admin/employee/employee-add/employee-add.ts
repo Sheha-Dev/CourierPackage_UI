@@ -18,6 +18,7 @@ import {
 
 import { UserService } from '../../../../services/user.service';
 import { RoleService } from '../../../../services/role.service';
+import { UserUpdateRequest } from '../../../../models/user';
 
 export interface EmployeeModel {
   id?: string;
@@ -185,6 +186,11 @@ export class EmployeeAdd implements OnInit,OnChanges {
       return;
     }
 
+    console.log(
+      'Employee form values:',
+      this.employeeForm.value
+    );
+
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -327,7 +333,7 @@ export class EmployeeAdd implements OnInit,OnChanges {
     this.isLoading = true;
 
 
-    const request = {
+    const request : UserUpdateRequest = {
 
       id:
         this.employee.id,
@@ -345,21 +351,34 @@ export class EmployeeAdd implements OnInit,OnChanges {
         this.employeeForm.value.nickName,
 
       position:
-        this.employeeForm.value.position
-
+        this.employeeForm.value.position,
+      trnUser: 
+        this.employee.id
     };
 
 
-    /*
-      Replace this with your actual
-      update employee service method.
-
-      Example:
+    
 
       this.userService
-        .updateEmployee(request)
-        .subscribe(...)
-    */
+        .updateUser(request).subscribe({
+
+        next: response => {
+          this.successMessage =
+            response?.message ??
+            'Employee updated successfully.';
+
+          this.employeeForm.reset();
+        },
+        
+        error: error => {
+          this.errorMessage =
+            error.error?.message ??
+            'Unable to update employee.';
+
+          this.employeeForm.reset();
+        }
+      });
+   
 
 
     console.log(
