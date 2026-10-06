@@ -1,0 +1,231 @@
+<table class="table table-striped align-middle table-responsive">
+  <thead>
+    <tr>
+      <th>Package Tracking ID</th>
+      <th>Package Type</th>
+      <th>Estimated Weight (kg)</th>
+      <th>Hand Over Warehouse</th>
+      <th>Status</th>
+      <th>Verified</th>
+      <th>Verified By</th>
+      <th>Verification Date</th>
+      <th>Received Date</th>
+      <th>Delivery Date</th>
+      <th>Estimated Amount</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody class="table-group-divider">
+
+          @for (
+            item of filteredPackages;
+            track item.packageId
+          ) {
+
+            <tr>
+
+              
+
+
+              <td>
+
+                <span class="tracking-id">
+
+                  {{
+                    item.packageTrackingId
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.boxTypeId
+                }}
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.estimatedWeight
+                    | number:'1.2-2'
+                }}
+                kg
+
+              </td>
+
+
+              <td>
+
+                <span class="location-value">
+
+                  📍
+
+                  Warehouse
+                  {{
+                    item.handOverWarehouseId
+                  }}
+
+                </span>
+
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [ngClass]="
+                    getStatusClass(
+                      item.statusId
+                    )"
+                    >
+
+                  {{
+                    getStatusLabel(item.statusId)
+                  }}
+
+                </span>
+              </td>
+                <td>
+    
+                    @if (
+                    item.isVerified
+                    ) {
+    
+                    <span
+                        class="verification-badge verified">
+    
+                        ✓ Verified
+    
+                    </span>
+    
+                    }
+                    @else {
+    
+                    <span
+                        class="verification-badge unverified">
+    
+                        Pending
+    
+                    </span>
+    
+                    }
+              
+
+                    </td>
+
+                    <td>
+                        {{
+                            item.verifiedBy
+                        }}
+                    </td>
+                    <td>
+                        {{
+                            item.verifiedDate
+                            | date:'dd MMM yyyy'
+                        }}
+                        <span class="date-time">
+                            {{
+                                item.verifiedDate
+                                | date:'hh:mm a'
+                            }}
+                        </span>
+                        </td>
+              <td>
+
+                {{
+                  item.receivedDate
+                    | date:'dd MMM yyyy'
+                }}
+
+                <span class="date-time">
+
+                  {{
+                    item.receivedDate
+                      | date:'hh:mm a'
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                {{
+                  item.expectedDeliverDate
+                    | date:'dd MMM yyyy'
+                }}
+
+                <span class="date-time">
+
+                  {{
+                    item.expectedDeliverDate
+                      | date:'hh:mm a'
+                  }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <strong>
+
+                  {{
+                    item.estimatedAmount
+                      | number:'1.2-2'
+                  }}
+
+                </strong>
+
+              </td>
+
+
+              
+
+
+              <td style="position: sticky; right: 0; background: rgb(58, 52, 75); z-index: 1;">
+
+                <div class="row-actions">
+
+                  <button
+                    type="button"
+                    class="icon-button"
+                    title="View package"
+                    [routerLink]="['/home/driver']"
+                    >
+
+                    View Package Routing
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="icon-button"
+                    title="Edit package"
+                    >
+
+                    Verify Package
+                    
+                  </button>
+
+
+                  
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+</table>
