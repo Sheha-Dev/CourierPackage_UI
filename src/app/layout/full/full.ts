@@ -49,6 +49,12 @@ export class Full implements OnInit {
       icon: '📦',
       roles: ['User']
     },
+    {
+      label: 'Driver',
+      route: '/home/driver',
+      icon: '🚗',
+      roles: ['Admin']
+    },
 
     {
       label: 'Recipient',
