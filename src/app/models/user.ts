@@ -14,10 +14,12 @@ export interface UserLoginRequest {
 }
 
 export interface UserUpdateRequest {
+  id?: string;
   userName: string;
   email: string;
   nickName: string;
   phoneNumber: string;
+  position: string;
   trnUser: string;
 }
 
