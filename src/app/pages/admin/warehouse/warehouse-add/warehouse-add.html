@@ -1,4 +1,4 @@
-<!-- <div class="warehouse-card">
+<div class="warehouse-card">
 
   <div class="card-header">
 
@@ -252,10 +252,10 @@
       <div class="map-wrapper">
 
         <app-map
-          [locations]="selectedMapLocation"
-          [height]="'380px'"
-          [zoom]="9"
-          (locationSelected)="mapPointSelected($event)">
+          [sourcePoint]="sourcePointValue" 
+          [destinationPoint]="selectedDestination"
+          [locationList]="destinationPoints"
+          (destinationPointChange)="mapPointSelected($event)">
         </app-map>
 
       </div>
@@ -317,7 +317,7 @@
 
 
 
-    <div class="form-actions">
+    <div class="form-actions" style="position: sticky; right: 0; background: rgb(58, 52, 75); z-index: 1;">
 
       <button
         type="button"
@@ -352,4 +352,3 @@
 
 </div>
 
--->

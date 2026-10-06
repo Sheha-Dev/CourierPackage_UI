@@ -18,7 +18,9 @@ import {
 } from '@angular/forms';
 
 import {
-  MapComponent
+  MapComponent,
+  MapOutputData,
+  MapPoint
 } from '../../../../components/map/map';
 
 import {
@@ -72,9 +74,11 @@ export class WarehouseAdd
   allDistricts: any[] = [];
 
 
-  selectedMapLocation:
-    Location[] = [];
+  // for map component
 
+  sourcePointValue! : MapPoint ;
+  selectedDestination! : MapPoint ;
+  destinationPoints : MapPoint[] = [];
 
   isEditMode = false;
 
@@ -102,643 +106,625 @@ export class WarehouseAdd
 
   ngOnInit(): void {
 
-    // this.createForm();
+    this.createForm();
 
-    // this.loadProvinces();
+    this.loadProvinces();
 
-    // this.loadDistricts();
+    this.loadDistricts();
 
 
-    // /*
-    //   If warehouse is already provided
-    //   when component opens in edit mode.
-    // */
-    // if (this.warehouse) {
+    /*
+      If warehouse is already provided
+      when component opens in edit mode.
+    */
+    if (this.warehouse) {
 
-    //   this.loadWarehouse(
-    //     this.warehouse
-    //   );
+      this.loadWarehouse(
+        this.warehouse
+      );
 
-    // }
+    }
 
   }
 
 
-//   private createForm(): void {
+  private createForm(): void {
 
-//     this.warehouseForm =
-//       this.fb.group({
+    this.warehouseForm =
+      this.fb.group({
 
-//         warehouseId: [
-//           null
-//         ],
+        warehouseId: [
+          null
+        ],
 
-//         warehouseName: [
-//           '',
-//           [
-//             Validators.required,
-//             Validators.maxLength(150)
-//           ]
-//         ],
+        warehouseName: [
+          '',
+          [
+            Validators.required,
+            Validators.maxLength(150)
+          ]
+        ],
 
-//         provinceId: [
-//           null,
-//           Validators.required
-//         ],
+        provinceId: [
+          null,
+          Validators.required
+        ],
 
-//         districtId: [
-//           null,
-//           Validators.required
-//         ],
+        districtId: [
+          null,
+          Validators.required
+        ],
 
-//         streetName: [
-//           '',
-//           Validators.required
-//         ],
+        streetName: [
+          '',
+          Validators.required
+        ],
 
-//         address: [
-//           '',
-//           Validators.required
-//         ],
+        address: [
+          '',
+          Validators.required
+        ],
 
-//         latitude: [
-//           null,
-//           Validators.required
-//         ],
+        latitude: [
+          null,
+          Validators.required
+        ],
 
-//         longitude: [
-//           null,
-//           Validators.required
-//         ]
+        longitude: [
+          null,
+          Validators.required
+        ]
 
-//       });
+      });
 
-//   }
+  }
 
 
-//   loadProvinces(): void {
+  loadProvinces(): void {
 
-//     this.provinceService
-//       .getAllProvinces()
-//       .subscribe({
+    this.provinceService
+      .getAllProvinces()
+      .subscribe({
 
-//         next: response => {
+        next: response => {
 
-//           this.provinces =
-//             response?.data ?? [];
+          this.provinces =
+            response?.data ?? [];
 
-//         },
+        },
 
-//         error: error => {
+        error: error => {
 
-//           console.error(
-//             'Province loading error',
-//             error
-//           );
+          console.error(
+            'Province loading error',
+            error
+          );
 
-//         }
+        }
 
-//       });
+      });
 
-//   }
+  }
 
 
-//   loadDistricts(): void {
+  loadDistricts(): void {
 
-//     this.districtService
-//       .getAllDistricts()
-//       .subscribe({
+    this.districtService
+      .getAllDistricts()
+      .subscribe({
 
-//         next: response => {
+        next: response => {
 
-//           this.allDistricts =
-//             response?.data ?? [];
+          this.allDistricts =
+            response?.data ?? [];
 
 
-//           this.districts =
-//             [...this.allDistricts];
+          this.districts =
+            [...this.allDistricts];
 
-//         },
+        },
 
-//         error: error => {
+        error: error => {
 
-//           console.error(
-//             'District loading error',
-//             error
-//           );
+          console.error(
+            'District loading error',
+            error
+          );
 
-//         }
+        }
 
-//       });
+      });
 
-//   }
+  }
 
 
-//   provinceChanged(): void {
+  provinceChanged(): void {
 
-//     const provinceId =
-//       Number(
-//         this.warehouseForm
-//           .get('provinceId')
-//           ?.value
-//       );
+    const provinceId =
+      Number(
+        this.warehouseForm
+          .get('provinceId')
+          ?.value
+      );
 
 
-//     const matchingDistricts =
-//       this.allDistricts.filter(
-//         district =>
-//           Number(
-//             district.provinceId
-//           ) === provinceId
-//       );
+    const matchingDistricts =
+      this.allDistricts.filter(
+        district =>
+          Number(
+            district.provinceId
+          ) === provinceId
+      );
 
 
-//     this.districts =
-//       matchingDistricts.length > 0
-//         ? matchingDistricts
-//         : [...this.allDistricts];
+    this.districts =
+      matchingDistricts.length > 0
+        ? matchingDistricts
+        : [...this.allDistricts];
 
 
-//     this.warehouseForm
-//       .get('districtId')
-//       ?.setValue(null);
+    this.warehouseForm
+      .get('districtId')
+      ?.setValue(null);
 
-//   }
+  }
 
 
-//   mapPointSelected(
-//   location: MapLocation
-// ): void {
+  mapPointSelected(
+  location: MapOutputData
+): void {
 
-//   console.log(
-//     'Map location selected:',
-//     location
-//   );
+  console.log(
+    'Map location selected:',
+    location
+  );
 
 
-//   const latitude =
-//     Number(
-//       location.latitude
-//     );
+  const latitude =
+    Number(
+      location.destination.latitude
+    );
 
-//   const longitude =
-//     Number(
-//       location.longitude
-//     );
+  const longitude =
+    Number(
+      location.destination.longitude
+    );
 
 
-//   this.warehouseForm
-//     .get('latitude')
-//     ?.setValue(latitude);
+  this.warehouseForm
+    .get('latitude')
+    ?.setValue(latitude);
 
 
-//   this.warehouseForm
-//     .get('longitude')
-//     ?.setValue(longitude);
+  this.warehouseForm
+    .get('longitude')
+    ?.setValue(longitude);
 
 
-//   this.warehouseForm
-//     .get('latitude')
-//     ?.markAsTouched();
+  this.warehouseForm
+    .get('latitude')
+    ?.markAsTouched();
 
 
-//   this.warehouseForm
-//     .get('longitude')
-//     ?.markAsTouched();
+  this.warehouseForm
+    .get('longitude')
+    ?.markAsTouched();
 
 
-//   this.warehouseForm
-//     .get('latitude')
-//     ?.updateValueAndValidity();
+  this.warehouseForm
+    .get('latitude')
+    ?.updateValueAndValidity();
 
 
-//   this.warehouseForm
-//     .get('longitude')
-//     ?.updateValueAndValidity();
+  this.warehouseForm
+    .get('longitude')
+    ?.updateValueAndValidity();
 
 
-//   this.selectedMapLocation = [
+  this.selectedDestination = 
 
-//     {
-//       latitude:
-//         latitude,
+    {
+      latitude:
+        latitude,
 
-//       longitude:
-//         longitude,
+      longitude:
+        longitude,
 
-//       label:
-//         this.warehouseForm
-//           .get('warehouseName')
-//           ?.value ||
-//         'Warehouse Location',
+      pointName:''
+    };
 
-//       description:
-//         this.warehouseForm
-//           .get('address')
-//           ?.value ||
-//         undefined
-//     }
 
-//   ];
+  console.log(
+    'Form coordinates:',
+    {
+      latitude:
+        this.warehouseForm
+          .get('latitude')
+          ?.value,
 
+      longitude:
+        this.warehouseForm
+          .get('longitude')
+          ?.value
+    }
+  );
 
-//   console.log(
-//     'Form coordinates:',
-//     {
-//       latitude:
-//         this.warehouseForm
-//           .get('latitude')
-//           ?.value,
+}
 
-//       longitude:
-//         this.warehouseForm
-//           .get('longitude')
-//           ?.value
-//     }
-//   );
 
-// }
+  loadWarehouse(
+    warehouse:
+      WarehouseFullRequestDto
+  ): void {
 
+    this.warehouse =
+      warehouse;
 
-//   loadWarehouse(
-//     warehouse:
-//       WarehouseFullRequestDto
-//   ): void {
 
-//     this.warehouse =
-//       warehouse;
+    this.isEditMode = true;
 
+    this.message = '';
 
-//     this.isEditMode = true;
+    this.errorMessage = '';
 
-//     this.message = '';
 
-//     this.errorMessage = '';
+    this.warehouseForm.patchValue({
 
+      warehouseId:
+        warehouse.warehouse
+          .warehouseId,
 
-//     this.warehouseForm.patchValue({
+      warehouseName:
+        warehouse.warehouse
+          .warehouseName,
 
-//       warehouseId:
-//         warehouse.warehouse
-//           .warehouseId,
+      provinceId:
+        warehouse.warehouse
+          .provinceId,
 
-//       warehouseName:
-//         warehouse.warehouse
-//           .warehouseName,
+      districtId:
+        warehouse.warehouse
+          .districtId,
 
-//       provinceId:
-//         warehouse.warehouse
-//           .provinceId,
+      streetName:
+        warehouse.warehouse
+          .streetName,
 
-//       districtId:
-//         warehouse.warehouse
-//           .districtId,
+      address:
+        warehouse.warehouse
+          .address,
 
-//       streetName:
-//         warehouse.warehouse
-//           .streetName,
+      latitude:
+        warehouse.location
+          .latitude,
 
-//       address:
-//         warehouse.warehouse
-//           .address,
+      longitude:
+        warehouse.location
+          .longitude
 
-//       latitude:
-//         warehouse.location
-//           .latitude,
+    });
 
-//       longitude:
-//         warehouse.location
-//           .longitude
 
-//     });
+    this.selectedDestination = 
 
+      {
+        latitude:
+          warehouse.location
+            .latitude,
 
-//     this.selectedMapLocation = [
+        longitude:
+          warehouse.location
+            .longitude,
 
-//       {
-//         latitude:
-//           warehouse.location
-//             .latitude,
+        pointName:''
+      }
 
-//         longitude:
-//           warehouse.location
-//             .longitude,
+    ;
 
-//         label:
-//           warehouse.warehouse
-//             .warehouseName,
+  }
 
-//         description:
-//           warehouse.warehouse
-//             .address
-//       }
 
-//     ];
+  saveWarehouse(): void {
 
-//   }
+  this.message = '';
+  this.errorMessage = '';
 
+  if (this.warehouseForm.invalid) {
 
-//   saveWarehouse(): void {
+    this.warehouseForm.markAllAsTouched();
 
-//   this.message = '';
-//   this.errorMessage = '';
+    this.errorMessage =
+      'Please complete all required fields and select a location on the map.';
 
-//   if (this.warehouseForm.invalid) {
+    return;
+  }
 
-//     this.warehouseForm.markAllAsTouched();
+  /*
+    getRawValue() returns all form values,
+    including disabled controls.
+  */
+  const value =
+    this.warehouseForm.getRawValue();
 
-//     this.errorMessage =
-//       'Please complete all required fields and select a location on the map.';
 
-//     return;
-//   }
+  const latitude =
+    Number(
+      this.warehouseForm
+        .get('latitude')
+        ?.value
+    );
 
-//   /*
-//     getRawValue() returns all form values,
-//     including disabled controls.
-//   */
-//   const value =
-//     this.warehouseForm.getRawValue();
 
+  const longitude =
+    Number(
+      this.warehouseForm
+        .get('longitude')
+        ?.value
+    );
 
-//   const latitude =
-//     Number(
-//       this.warehouseForm
-//         .get('latitude')
-//         ?.value
-//     );
 
+  console.log(
+    'Selected latitude:',
+    latitude
+  );
 
-//   const longitude =
-//     Number(
-//       this.warehouseForm
-//         .get('longitude')
-//         ?.value
-//     );
+  console.log(
+    'Selected longitude:',
+    longitude
+  );
 
 
-//   console.log(
-//     'Selected latitude:',
-//     latitude
-//   );
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
 
-//   console.log(
-//     'Selected longitude:',
-//     longitude
-//   );
+    this.errorMessage =
+      'Please select a valid warehouse location on the map.';
 
+    return;
+  }
 
-//   if (
-//     !Number.isFinite(latitude) ||
-//     !Number.isFinite(longitude)
-//   ) {
 
-//     this.errorMessage =
-//       'Please select a valid warehouse location on the map.';
+  const trnUser =
+    sessionStorage.getItem(
+      'userName'
+    ) ?? 'SYSTEM';
 
-//     return;
-//   }
 
+  const request:
+    WarehouseFullRequestDto = {
 
-//   const trnUser =
-//     sessionStorage.getItem(
-//       'userName'
-//     ) ?? 'SYSTEM';
+    warehouse: {
 
+      warehouseId:
+        value.warehouseId ?? 0,
 
-//   const request:
-//     WarehouseFullRequestDto = {
+      warehouseName:
+        value.warehouseName,
 
-//     warehouse: {
+      provinceId:
+        Number(
+          value.provinceId
+        ),
 
-//       warehouseId:
-//         value.warehouseId ?? 0,
+      districtId:
+        Number(
+          value.districtId
+        ),
 
-//       warehouseName:
-//         value.warehouseName,
+      streetName:
+        value.streetName,
 
-//       provinceId:
-//         Number(
-//           value.provinceId
-//         ),
+      address:
+        value.address,
 
-//       districtId:
-//         Number(
-//           value.districtId
-//         ),
+      trnUser:
+        trnUser
 
-//       streetName:
-//         value.streetName,
+    },
 
-//       address:
-//         value.address,
+    location: {
 
-//       trnUser:
-//         trnUser
+      latitude:
+        latitude,
 
-//     },
+      longitude:
+        longitude,
 
-//     location: {
+      trnUser:
+        trnUser
 
-//       latitude:
-//         latitude,
+    }
 
-//       longitude:
-//         longitude,
+  };
 
-//       trnUser:
-//         trnUser
 
-//     }
+  /*
+    Preserve IDs during update.
+  */
+  if (
+    this.isEditMode &&
+    this.warehouse
+  ) {
 
-//   };
+    if (
+      this.warehouse.location
+        ?.locationId
+    ) {
 
+      request.location.locationId =
+        this.warehouse
+          .location.locationId;
 
-//   /*
-//     Preserve IDs during update.
-//   */
-//   if (
-//     this.isEditMode &&
-//     this.warehouse
-//   ) {
+    }
 
-//     if (
-//       this.warehouse.location
-//         ?.locationId
-//     ) {
 
-//       request.location.locationId =
-//         this.warehouse
-//           .location.locationId;
+    if (
+      this.warehouse.warehouse
+        ?.warehouseLocationId
+    ) {
 
-//     }
+      request.warehouse.warehouseLocationId =
+        this.warehouse
+          .warehouse.warehouseLocationId;
 
+    }
 
-//     if (
-//       this.warehouse.warehouse
-//         ?.warehouseLocationId
-//     ) {
+  }
 
-//       request.warehouse.warehouseLocationId =
-//         this.warehouse
-//           .warehouse.warehouseLocationId;
 
-//     }
+  console.log(
+    'Warehouse request:',
+    request
+  );
 
-//   }
 
+  this.isSaving = true;
 
-//   console.log(
-//     'Warehouse request:',
-//     request
-//   );
 
+  if (this.isEditMode) {
 
-//   this.isSaving = true;
+    this.updateWarehouse(
+      request
+    );
 
+  }
+  else {
 
-//   if (this.isEditMode) {
+    this.createWarehouse(
+      request
+    );
 
-//     this.updateWarehouse(
-//       request
-//     );
+  }
 
-//   }
-//   else {
+}
 
-//     this.createWarehouse(
-//       request
-//     );
 
-//   }
+  private createWarehouse(
+    request:
+      WarehouseFullRequestDto
+  ): void {
 
-// }
+    this.warehouseService
+      .createWarehouse(
+        request
+      )
+      .subscribe({
 
+        next: response => {
 
-//   private createWarehouse(
-//     request:
-//       WarehouseFullRequestDto
-//   ): void {
+          this.isSaving = false;
 
-//     this.warehouseService
-//       .createWarehouse(
-//         request
-//       )
-//       .subscribe({
 
-//         next: response => {
+          this.message =
+            response?.message ??
+            'Warehouse created successfully.';
 
-//           this.isSaving = false;
 
+          this.resetForm();
 
-//           this.message =
-//             response?.message ??
-//             'Warehouse created successfully.';
 
+          this.saved.emit();
 
-//           this.resetForm();
+        },
 
+        error: error => {
 
-//           this.saved.emit();
+          this.isSaving = false;
 
-//         },
 
-//         error: error => {
+          this.errorMessage =
+            error?.error?.message ??
+            'Unable to create warehouse.';
 
-//           this.isSaving = false;
+        }
 
+      });
 
-//           this.errorMessage =
-//             error?.error?.message ??
-//             'Unable to create warehouse.';
+  }
 
-//         }
 
-//       });
+  private updateWarehouse(
+    request:
+      WarehouseFullRequestDto
+  ): void {
 
-//   }
+    this.warehouseService
+      .updateWarehouse(
+        request
+      )
+      .subscribe({
 
+        next: response => {
 
-//   private updateWarehouse(
-//     request:
-//       WarehouseFullRequestDto
-//   ): void {
+          this.isSaving = false;
 
-//     this.warehouseService
-//       .updateWarehouse(
-//         request
-//       )
-//       .subscribe({
 
-//         next: response => {
+          this.message =
+            response?.message ??
+            'Warehouse updated successfully.';
 
-//           this.isSaving = false;
 
+          this.resetForm();
 
-//           this.message =
-//             response?.message ??
-//             'Warehouse updated successfully.';
 
+          this.saved.emit();
 
-//           this.resetForm();
+        },
 
+        error: error => {
 
-//           this.saved.emit();
+          this.isSaving = false;
 
-//         },
 
-//         error: error => {
+          this.errorMessage =
+            error?.error?.message ??
+            'Unable to update warehouse.';
 
-//           this.isSaving = false;
+        }
 
+      });
 
-//           this.errorMessage =
-//             error?.error?.message ??
-//             'Unable to update warehouse.';
+  }
 
-//         }
 
-//       });
+  resetForm(): void {
 
-//   }
+    this.warehouseForm.reset();
 
 
-//   resetForm(): void {
+    this.selectedDestination;
 
-//     this.warehouseForm.reset();
 
+    this.isEditMode = false;
 
-//     this.selectedMapLocation = [];
 
+    this.warehouse = null;
 
-//     this.isEditMode = false;
 
+    this.message = '';
 
-//     this.warehouse = null;
+    this.errorMessage = '';
 
+  }
 
-//     this.message = '';
 
-//     this.errorMessage = '';
+  hasError(
+    controlName: string
+  ): boolean {
 
-//   }
+    const control =
+      this.warehouseForm
+        .get(controlName);
 
 
-//   hasError(
-//     controlName: string
-//   ): boolean {
+    return !!(
+      control &&
+      control.invalid &&
+      control.touched
+    );
 
-//     const control =
-//       this.warehouseForm
-//         .get(controlName);
-
-
-//     return !!(
-//       control &&
-//       control.invalid &&
-//       control.touched
-//     );
-
-//   }
+  }
 
 }
