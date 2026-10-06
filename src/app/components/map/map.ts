@@ -72,6 +72,9 @@ export class MapComponent
   @Input()
   locationList: MapPoint[] = [];
 
+  @Input()
+    routeRequired : boolean = false;
+
   // source and destination points and route distance and duration will be emitted to the parent component when user select the destination point from the map
   @Output()
   destinationPointChange =
@@ -130,7 +133,7 @@ export class MapComponent
 
 
     if (
-      changes['sourcePoint']
+      changes['sourcePoint'] && this.routeRequired
     ) {
 
       console.log('Source Point Changed in map.');
@@ -149,7 +152,7 @@ export class MapComponent
 
       if (
         this.sourcePoint &&
-        this.destinationPoint
+        this.destinationPoint && this.routeRequired
       ) {
         
         this.loadRoute();
@@ -266,7 +269,7 @@ export class MapComponent
     event: L.LeafletMouseEvent
   ): Promise<void> {
 
-    if (!this.sourcePoint) {
+    if (!this.sourcePoint && this.routeRequired) {
       console.warn('Source location must be selected first.');
       return;
     }
@@ -282,9 +285,13 @@ export class MapComponent
     this.renderDestination();
 
     // Calculate route and WAIT for the result
-    await this.loadRouteToPoint(
+
+    if(this.routeRequired){
+      await this.loadRouteToPoint(
       this.destinationPoint
     );
+    }
+    
 
     // Create output AFTER route calculation
     const point: MapOutputData = {
