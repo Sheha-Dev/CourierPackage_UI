@@ -57,8 +57,8 @@ export const routes: Routes = [
         path: 'admin-package',
 
         loadComponent: () =>
-          import('./pages/admin/package/package')
-            .then(m => m.Package)
+          import('./pages/admin/admin-package/admin-package')
+            .then(m => m.AdminPackage)
       },
 
       {
@@ -83,6 +83,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/admin/warehouse/warehouse')
             .then(m => m.Warehouse)
+      },
+      {
+        path: 'driver',
+
+        loadComponent: () =>
+          import('./pages/admin/driver/driver')
+            .then(m => m.Driver)
       }
 
     ]
