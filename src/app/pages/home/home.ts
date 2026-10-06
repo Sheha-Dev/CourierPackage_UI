@@ -57,6 +57,13 @@ export class Home implements OnInit {
       route: '/home/admin-package',
       roles: ['Admin']
     },
+    {
+      title: 'Drivers',
+      description: 'Manage courier drivers.',
+      icon: '🚗',
+      route: '/home/driver',
+      roles: ['Admin']
+    },
 
     {
       title: 'Roles',
